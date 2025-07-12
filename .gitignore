@@ -1,0 +1,114 @@
+# .NET Core / .NET 9
+bin/
+obj/
+*.csproj.user
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.pdb
+*.exe
+*.dll
+*.cache
+*.log
+*.vs/
+.vscode/
+.idea/
+*.swp
+*.swo
+*.nupkg
+*.snk
+
+# Build and Publish Artifacts
+**/bin/
+**/obj/
+**/publish/
+*.PublishSettings
+*.pubxml
+*.pubxml.user
+
+# ASP.NET Core
+wwwroot/
+appsettings.Development.json
+appsettings.Production.json
+appsettings.*.json
+
+# Sensitive Files
+secrets.json
+*.key
+*.pem
+*.pfx
+*.cer
+*.crt
+*.env
+
+# Docker
+Dockerfile.user
+docker-compose.override.yml
+docker-compose.*.yml
+*.dockerignore
+*.container
+
+# Database Files
+*.mdf
+*.ldf
+*.bak
+*.sdf
+*.db
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Temporary Files
+*.tmp
+*.temp
+*.bak
+*.cache
+*.swp
+*~
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.code-workspace
+*.sublime-project
+*.sublime-workspace
+
+# NuGet Packages
+packages/
+*.nupkg
+
+# Test and Coverage
+testresults/
+coverage/
+*.trx
+*.xml
+*.coverage
+*.coveragexml
+
+# CI/CD and Build Tools
+artifacts/
+build/
+dist/
+out/
+*.tgz
+*.zip
+*.tar.gz
+
+# Kafka and Message Brokers
+kafka-logs/
+*.kafka
+
+# Miscellaneous
+Thumbs.db
+.DS_Store
+*.pidb
+*.userprefs
+*.suo
+
+# Keep essential files
+!appsettings.json
+!docker-compose.yml
+!Dockerfile
