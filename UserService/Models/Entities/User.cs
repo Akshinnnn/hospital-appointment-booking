@@ -1,0 +1,35 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+
+namespace UserService.Models.Entities
+{
+    [Table("Users")]
+    public class User
+    {
+    
+        public Guid Id { get; set; } = Guid.NewGuid();
+
+        [Required]
+        [MaxLength(100)]
+        public string Full_Name { get; set; }
+
+        [Required]
+        [MaxLength(100)]
+        [EmailAddress]
+        public string Email { get; set; }
+        [Phone]
+        public string? Phone_Number { get; set; }
+        [Required]
+        public string Password { get; set; }
+        [Required]
+        public UserRole Role { get; set; }
+
+        [Required]
+        public DateTime Created_At { get; set; }
+    }
+}

@@ -1,0 +1,60 @@
+version: '3.9'
+services:
+  userservice:
+    image: ${PROJECT_NAME}_user
+    container_name: ${PROJECT_NAME}_user
+    build:
+      context: ./UserService
+    restart: unless-stopped
+    ports:
+      - 8081:8080
+    env_file:
+      - ./config/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - default
+
+  postgres:
+    image: postgres:14.2
+    container_name: ${PROJECT_NAME}_db
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
+    env_file:
+      - ./config/.env
+    networks:
+      - default
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # kafka:
+  #   image: confluentinc/cp-kafka:7.4.0
+  #   environment:
+  #     KAFKA_BROKER_ID: 1
+  #     KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+  #     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  #   depends_on:
+  #     - zookeeper
+
+  # zookeeper:
+  #   image: confluentinc/cp-zookeeper:7.4.0
+  #   environment:
+  #     ZOOKEEPER_CLIENT_PORT: 2181
+  #     ZOOKEEPER_TICK_TIME: 2000
+
+volumes:
+  pgdata:
+    driver: local
+    name: ${PROJECT_NAME}_pgdata
+
+networks:
+  default:
+    driver: bridge
