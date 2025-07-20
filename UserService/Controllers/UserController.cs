@@ -6,7 +6,7 @@ using UserService.Services;
 namespace UserService.Controllers;
 
 [ApiController]
-[Route("api/auth")]
+[Route("api")]
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
@@ -17,7 +17,7 @@ public class UserController : ControllerBase
     }
 
     // POST: api/auth/register
-    [HttpPost("register")]
+    [HttpPost("auth/register")]
     public async Task<IActionResult> Register([FromBody] RegisterDTO dto)
     {
         var token = await _userService.RegisterAsync(dto);
@@ -25,14 +25,14 @@ public class UserController : ControllerBase
     }
 
     // POST: api/auth/login
-    [HttpPost("login")]
+    [HttpPost("auth/login")]
     public async Task<IActionResult> Login([FromBody] LoginDTO dto)
     {
         var token = await _userService.LoginAsync(dto);
         return Ok(new { Token = token });
     }
 
-    // GET: api/auth/profile
+    // GET: api/profile
     [Authorize]
     [HttpGet("profile")]
     public async Task<IActionResult> GetProfile()
@@ -45,16 +45,16 @@ public class UserController : ControllerBase
         return Ok(userProfile);
     }
 
-    // DELETE: api/auth/delete
+    // DELETE: api/profile
     [Authorize]
-    [HttpDelete("delete")]
-    public async Task<IActionResult> DeleteAccount()
+    [HttpPut("profile")]
+    public async Task<IActionResult> UpdateAccount([FromBody] UpdateDTO dto)
     {
         var userId = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var guid))
             return Unauthorized("Invalid token");
 
-        await _userService.DeleteUserAsync(guid);
-        return NoContent();
+        await _userService.UpdateUserAsync(guid, dto);
+        return Ok();
     }
 }

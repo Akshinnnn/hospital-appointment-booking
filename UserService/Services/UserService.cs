@@ -64,12 +64,13 @@ public class UserService : IUserService
         return _mapper.Map<UserDTO>(user);
     }
 
-    public async Task DeleteUserAsync(Guid userId)
+    public async Task UpdateUserAsync(Guid guid, UpdateDTO dto)
     {
-        var user = await _userRepository.GetByIdAsync(userId)
+        var user = await _userRepository.GetByIdAsync(guid)
             ?? throw new KeyNotFoundException("User not found");
 
-        await _userRepository.DeleteAsync(user);
+        var entity = _mapper.Map(dto, user);
+        await _userRepository.UpdateAsync(entity);
     }
 
     private string GenerateJwtToken(User user)

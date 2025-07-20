@@ -11,6 +11,6 @@ namespace UserService.Services
         Task<string> RegisterAsync(RegisterDTO dto);
         Task<string> LoginAsync(LoginDTO dto);
         Task<UserDTO> GetUserProfileAsync(Guid userId);
-        Task DeleteUserAsync(Guid userId);
+        Task UpdateUserAsync(Guid guid, UpdateDTO dto);
     }
 }

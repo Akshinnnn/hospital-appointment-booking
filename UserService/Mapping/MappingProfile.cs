@@ -11,6 +11,7 @@ public class MappingProfile : Profile
         CreateMap<RegisterDTO, User>()
             .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.Password));
         CreateMap<LoginDTO, User>();
+        CreateMap<UpdateDTO, User>();
         CreateMap<User, UserDTO>();
     }
 }
