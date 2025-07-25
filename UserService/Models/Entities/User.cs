@@ -11,7 +11,7 @@ namespace UserService.Models.Entities
     [Table("Users")]
     public class User
     {
-    
+
         public Guid Id { get; set; } = Guid.NewGuid();
 
         [Required]
@@ -31,5 +31,8 @@ namespace UserService.Models.Entities
 
         [Required]
         public DateTime Created_At { get; set; }
+        
+        public ICollection<DoctorSchedule> Availabilities { get; set; }
+
     }
 }

@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using UserService.Data;
 
 #nullable disable
 
-namespace UserService.Data.Migrations
+namespace UserService.Migrations
 {
     [DbContext(typeof(UsersDbContext))]
-    partial class UsersDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250724114225_InitialMigration")]
+    partial class InitialMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,6 +24,31 @@ namespace UserService.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("UserService.Models.Entities.DoctorSchedule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Day_Of_Week")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("Doctor_Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<TimeSpan>("End_Time")
+                        .HasColumnType("interval");
+
+                    b.Property<TimeSpan>("Start_Time")
+                        .HasColumnType("interval");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Doctor_Id");
+
+                    b.ToTable("Doctor_Schedules");
+                });
 
             modelBuilder.Entity("UserService.Models.Entities.User", b =>
                 {
@@ -58,6 +86,22 @@ namespace UserService.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("UserService.Models.Entities.DoctorSchedule", b =>
+                {
+                    b.HasOne("UserService.Models.Entities.User", "Doctor")
+                        .WithMany("Availabilities")
+                        .HasForeignKey("Doctor_Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Doctor");
+                });
+
+            modelBuilder.Entity("UserService.Models.Entities.User", b =>
+                {
+                    b.Navigation("Availabilities");
                 });
 #pragma warning restore 612, 618
         }

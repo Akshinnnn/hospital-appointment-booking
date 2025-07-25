@@ -6,6 +6,7 @@ namespace UserService.Data;
 public class UsersDbContext : DbContext
 {
     public DbSet<User> Users { get; set; }
+    public DbSet<DoctorSchedule> Doctor_Schedules { get; set; }
 
     public UsersDbContext(DbContextOptions<UsersDbContext> options) : base(options) { }
 
@@ -18,5 +19,10 @@ public class UsersDbContext : DbContext
         modelBuilder.Entity<User>()
             .Property(u => u.Role)
             .HasConversion<string>(); 
+
+        modelBuilder.Entity<DoctorSchedule>()
+            .HasOne(d => d.Doctor)
+            .WithMany(u => u.Availabilities)
+            .HasForeignKey(d => d.Doctor_Id);    
     }
 }

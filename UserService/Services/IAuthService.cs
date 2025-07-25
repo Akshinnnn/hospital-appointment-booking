@@ -6,7 +6,7 @@ using UserService.Models.DTOs;
 
 namespace UserService.Services
 {
-    public interface IUserService
+    public interface IAuthService
     {
         Task<string> RegisterAsync(RegisterDTO dto);
         Task<string> LoginAsync(LoginDTO dto);

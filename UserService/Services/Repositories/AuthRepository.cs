@@ -5,7 +5,7 @@ using UserService.Models.Entities;
 
 namespace UserService.Services.Repositories;
 
-public interface IUserRepository
+public interface IAuthRepository
 {
     Task<User> GetByUsernameAsync(string name);
     Task<User> GetByEmailAsync(string email);
@@ -16,11 +16,11 @@ public interface IUserRepository
     Task DeleteAsync(User user);
 }
 
-public class UserRepository : IUserRepository
+public class AuthRepository : IAuthRepository
 {
     private readonly UsersDbContext _dbContext;
 
-    public UserRepository(UsersDbContext dbContext)
+    public AuthRepository(UsersDbContext dbContext)
     {
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
@@ -44,7 +44,7 @@ public class UserRepository : IUserRepository
 
     public async Task AddAsync(User user)
     {
-        _dbContext.Users.Add(user);
+        await _dbContext.Users.AddAsync(user);
         await _dbContext.SaveChangesAsync();
     }
 

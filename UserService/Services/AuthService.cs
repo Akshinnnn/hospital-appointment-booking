@@ -11,14 +11,14 @@ using UserService.Services.Repositories;
 
 namespace UserService.Services;
 
-public class UserService : IUserService
+public class AuthService : IAuthService
 {
-    private readonly IUserRepository _userRepository;
+    private readonly IAuthRepository _userRepository;
     private readonly IMapper _mapper;
     private readonly IConfiguration _configuration;
 
-    public UserService(
-        IUserRepository userRepository,
+    public AuthService(
+        IAuthRepository userRepository,
         IMapper mapper,
         IConfiguration configuration)
     {

@@ -39,8 +39,10 @@ builder.Services.AddAuthentication("Bearer")
         };
     });
 builder.Services.AddAuthorization();
-builder.Services.AddScoped<IUserService, UserService.Services.UserService>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IScheduleService, ScheduleService>();
+builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
 
 var app = builder.Build();
 
