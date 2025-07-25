@@ -32,8 +32,8 @@ public class ScheduleController : ControllerBase
             if (string.IsNullOrWhiteSpace(doctorId) || !Guid.TryParse(doctorId, out var guid))
                 return Unauthorized("Invalid token");
 
-            await _scheduleService.AddSchedule(guid, dto);
-            return Ok("Schedule added successfully.");
+            var schedule = await _scheduleService.AddSchedule(guid, dto);
+            return Ok(schedule);
         }
         catch (Exception ex)
         {
@@ -59,14 +59,11 @@ public class ScheduleController : ControllerBase
 
     // GET api/schedule/{scheduleId}
     [HttpGet("schedule/{scheduleId}")]
-    public async Task<IActionResult> GetScheduleById(Guid scheduleId)
+    public async Task<IActionResult> GetScheduleById([FromRoute] Guid scheduleId)
     {
         try
         {
-            var doctorId = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrWhiteSpace(doctorId) || !Guid.TryParse(doctorId, out var guid))
-            return Unauthorized("Invalid token");
-            var schedule = await _scheduleService.GetScheduleById(guid, scheduleId);
+            var schedule = await _scheduleService.GetScheduleById(scheduleId);
             return Ok(schedule);
         }
         catch (Exception ex)
@@ -77,7 +74,7 @@ public class ScheduleController : ControllerBase
 
     // PUT: api/schedule/{scheduleId}
     [HttpPut("schedule/{scheduleId}")]
-    public async Task<IActionResult> UpdateSchedule(Guid scheduleId, [FromBody] ScheduleDTO dto)
+    public async Task<IActionResult> UpdateSchedule([FromRoute] Guid scheduleId, [FromBody] ScheduleDTO dto)
     {
         try
         {
@@ -92,14 +89,11 @@ public class ScheduleController : ControllerBase
 
     // DELETE: api/schedule/{scheduleId}
     [HttpDelete("schedule/{scheduleId}")]
-    public async Task<IActionResult> DeleteSchedule(Guid scheduleId)
+    public async Task<IActionResult> DeleteSchedule([FromRoute] Guid scheduleId)
     {
     try
     {
-        var doctorId = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrWhiteSpace(doctorId) || !Guid.TryParse(doctorId, out var guid))
-            return Unauthorized("Invalid token");
-        await _scheduleService.RemoveSchedule(guid, scheduleId);
+        await _scheduleService.RemoveSchedule(scheduleId);
         return Ok("Schedule deleted successfully.");
     }
     catch (Exception ex)

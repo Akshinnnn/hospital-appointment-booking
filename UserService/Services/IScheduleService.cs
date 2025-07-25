@@ -11,10 +11,10 @@ namespace UserService.Services
 {
     public interface IScheduleService
     {
-        Task<ScheduleDTO> GetScheduleById(Guid doctorId, Guid scheduleId);
+        Task<ScheduleDTO> GetScheduleById(Guid scheduleId);
         Task<List<ScheduleDTO>> GetSchedules(Guid doctorId);
-        Task AddSchedule(Guid doctorId, AddScheduleDTO dto);
-        Task RemoveSchedule(Guid doctorId, Guid scheduleId);
+        Task<DoctorSchedule> AddSchedule(Guid doctorId, AddScheduleDTO dto);
+        Task RemoveSchedule(Guid scheduleId);
         Task UpdateSchedule(Guid guid, ScheduleDTO dto);
     }
 }

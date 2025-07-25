@@ -53,8 +53,9 @@ namespace UserService.Services.Repositories
 
         public async Task<List<DoctorSchedule>> GetSchedules(Guid doctorId)
         {
-            var doctor = await _dbContext.Users.FirstOrDefaultAsync(d => d.Id == doctorId);
-            return doctor.Availabilities.ToList();
+            return await _dbContext.Doctor_Schedules
+            .Where(s => s.Doctor_Id == doctorId)
+            .ToListAsync();
         }
 
         public async Task UpdateAsync(DoctorSchedule schedule)

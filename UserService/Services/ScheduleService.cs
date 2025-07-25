@@ -26,7 +26,7 @@ public class ScheduleService : IScheduleService
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
     }
 
-    public async Task AddSchedule(Guid doctorId, AddScheduleDTO dto)
+    public async Task<DoctorSchedule> AddSchedule(Guid doctorId, AddScheduleDTO dto)
     {
         if (dto == null)
             throw new ArgumentException("Schedule data is required");
@@ -50,52 +50,44 @@ public class ScheduleService : IScheduleService
         var schedule = _mapper.Map<DoctorSchedule>(dto);
         schedule.Doctor_Id = doctorId;
         await _scheduleRepository.AddAsync(schedule);
+        return schedule;
     }
 
     public async Task<List<ScheduleDTO>> GetSchedules(Guid doctorId)
     {
         if (doctorId == Guid.Empty)
-            throw new ArgumentException("Doctor ID is required");
+        throw new ArgumentException("Doctor ID is required");
 
-        var schedules = await _scheduleRepository.GetSchedules(doctorId) ?? throw new KeyNotFoundException("No information found!");
+        var schedules = await _scheduleRepository.GetSchedules(doctorId);
 
-        var schedulesDTO = _mapper.Map<IEnumerable<ScheduleDTO>>(schedules).ToList();
-        return schedulesDTO;
+        if (schedules == null || schedules.Count == 0)
+            return new List<ScheduleDTO>();
+
+        return _mapper.Map<List<ScheduleDTO>>(schedules);
     }
 
-    public async Task<ScheduleDTO> GetScheduleById(Guid doctorId, Guid scheduleId)
+    public async Task<ScheduleDTO> GetScheduleById(Guid scheduleId)
     {
-        if (doctorId == Guid.Empty)
-            throw new ArgumentException("Doctor ID is required");
-
         if (scheduleId == Guid.Empty)
             throw new ArgumentException("Schedule ID is required");
 
-        var schedules = await _scheduleRepository.GetSchedules(doctorId) ?? throw new KeyNotFoundException("No information found!");
-        var schedule = schedules.FirstOrDefault(s => s.Id == scheduleId);
+        var schedule = await _scheduleRepository.GetScheduleById(scheduleId);
         var scheduleDTO = _mapper.Map<ScheduleDTO>(schedule);
         return scheduleDTO;
     }
 
-    public async Task RemoveSchedule(Guid doctorId, Guid scheduleId)
+    public async Task RemoveSchedule(Guid scheduleId)
     {
-        if (doctorId == Guid.Empty)
-            throw new ArgumentException("Doctor ID is required");
-
-        var schedules = await _scheduleRepository.GetSchedules(doctorId) 
-                        ?? throw new KeyNotFoundException("No schedule found for this doctor.");
-
-        var schedule = schedules.FirstOrDefault(s => s.Id == scheduleId);
-        if (schedule == null)
-            throw new KeyNotFoundException("Schedule not found.");
+        var schedule = await _scheduleRepository.GetScheduleById(scheduleId)
+        ?? throw new KeyNotFoundException("Schedule not found.");
 
         await _scheduleRepository.DeleteAsync(schedule);
     }
 
-    public async Task UpdateSchedule(Guid guid, ScheduleDTO dto)
+    public async Task UpdateSchedule(Guid scheduleId, ScheduleDTO dto)
     {
         if (dto == null)
-            throw new ArgumentException("Schedule data is required");
+        throw new ArgumentException("Schedule data is required");
 
         if (!Enum.IsDefined(typeof(DayOfWeek), dto.Day_Of_Week))
             throw new ArgumentException("Invalid day of week");
@@ -106,8 +98,19 @@ public class ScheduleService : IScheduleService
         if (dto.Start_Time >= dto.End_Time)
             throw new ArgumentException("Start time must be earlier than end time");
 
-        var schedule = await _scheduleRepository.GetScheduleById(guid);
-        var updatedSchedule = _mapper.Map<DoctorSchedule>(schedule);
-        await _scheduleRepository.UpdateAsync(updatedSchedule);
+        var schedule = await _scheduleRepository.GetScheduleById(scheduleId)
+                    ?? throw new KeyNotFoundException("Schedule not found.");
+
+        var exists = await _scheduleRepository.ExistsAsync(schedule.Doctor_Id, dto.Day_Of_Week, dto.Start_Time, dto.End_Time);
+        if (exists && (schedule.Day_Of_Week != dto.Day_Of_Week ||
+                    schedule.Start_Time  != dto.Start_Time  ||
+                    schedule.End_Time    != dto.End_Time))
+            throw new InvalidOperationException("This schedule already exists for the doctor.");
+
+        schedule.Day_Of_Week = dto.Day_Of_Week;
+        schedule.Start_Time  = dto.Start_Time;
+        schedule.End_Time    = dto.End_Time;
+
+        await _scheduleRepository.UpdateAsync(schedule);
     }
 }
