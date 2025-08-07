@@ -1,5 +1,17 @@
 version: '3.9'
 services:
+
+  apigateway:
+    build:
+      context: ./ApiGateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - userservice
+      - appointmentservice
+    networks:
+      default: {}
+
   userservice:
     image: ${PROJECT_NAME}_user
     container_name: ${PROJECT_NAME}_user
@@ -12,7 +24,21 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - default
+      default: {}
+
+  appointmentservice:
+    image: ${PROJECT_NAME}_appointment
+    container_name: ${PROJECT_NAME}_appointment
+    build:
+      context: ./AppointmentService
+    restart: unless-stopped
+    ports:
+      - 8082:8080
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      default: {}
 
   postgres:
     image: postgres:14.2
@@ -23,7 +49,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data/
     networks:
-      - default
+      default: {}
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s

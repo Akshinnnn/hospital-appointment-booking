@@ -11,7 +11,7 @@ namespace UserService.Models.Entities
     [Table("Users")]
     public class User
     {
-
+        [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
 
         [Required]
