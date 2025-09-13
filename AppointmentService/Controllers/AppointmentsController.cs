@@ -35,7 +35,11 @@ namespace AppointmentService.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(AppointmentCreateDTO dto)
         {
-            var entity = await _service.CreateAsync(dto);
+            var userId = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var guid))
+                return Unauthorized("Invalid token");
+
+            var entity = await _service.CreateAsync(dto, guid);
             return Ok(entity);
         }
 

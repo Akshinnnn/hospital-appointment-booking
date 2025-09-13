@@ -11,7 +11,7 @@ namespace AppointmentService.Services
     {
         Task<List<AppointmentDTO>> GetAllAsync();
         Task<AppointmentDTO> GetByIdAsync(Guid id);
-        Task<Appointment> CreateAsync(AppointmentCreateDTO dto);
+        Task<Appointment> CreateAsync(AppointmentCreateDTO dto, Guid guid);
         Task DeleteAsync(Guid id);
     }
 }

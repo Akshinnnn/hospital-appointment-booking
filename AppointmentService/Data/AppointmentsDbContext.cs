@@ -16,7 +16,7 @@ public class AppointmentsDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Apply a value converter to all DateTime properties
+        
         var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
             v => v.ToUniversalTime(),  // Convert to UTC before saving to the database
             v => DateTime.SpecifyKind(v, DateTimeKind.Utc) // Set the kind to UTC when reading from the database

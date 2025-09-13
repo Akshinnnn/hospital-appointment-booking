@@ -29,9 +29,10 @@ namespace AppointmentService.Services
             return _mapper.Map<AppointmentDTO>(appointment);
         }
 
-        public async Task<Appointment> CreateAsync(AppointmentCreateDTO dto)
+        public async Task<Appointment> CreateAsync(AppointmentCreateDTO dto, Guid guid)
         {
             var entity = _mapper.Map<Appointment>(dto);
+            entity.PatientId = guid;
             await _repository.CreateAsync(entity);
             return entity;
         }

@@ -8,7 +8,6 @@ namespace AppointmentService.Models.DTOs.AppointmentDTOs
     public class AppointmentCreateDTO
     {
         public Guid DoctorId { get; set; }
-        public Guid PatientId { get; set; }
         public Guid ScheduleId { get; set; }
         public DateTime AppointmentTime { get; set; }
         public string? Notes { get; set; }
