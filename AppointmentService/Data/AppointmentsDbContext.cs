@@ -35,7 +35,7 @@ public class AppointmentsDbContext : DbContext
         
         modelBuilder.Entity<Appointment>()
         .Property(a => a.Status)
-        .HasDefaultValue(AppointmentStatus.PENDING);
+        .HasDefaultValue(AppointmentStatus.APPROVED);
 
     }
 }

@@ -42,5 +42,11 @@ namespace AppointmentService.Services.Repositories
         {
             return await _context.Appointments.Where(expression).ToListAsync();
         }
+
+        public async Task UpdateAsync(Appointment appointment)
+        {
+            _context.Appointments.Update(appointment);
+            await _context.SaveChangesAsync();
+        }   
     }
 }

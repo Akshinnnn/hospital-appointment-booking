@@ -58,5 +58,13 @@ namespace AppointmentService.Services
 
             return new List<AppointmentDTO>();
         }
+
+        public async Task CancelAppointment(Guid id)
+        {
+            var appointment = await _repository.GetByIdAsync(id) ?? throw new KeyNotFoundException("Appointment not found");
+            appointment.Status = AppointmentStatus.CANCELLED;
+            await _repository.UpdateAsync(appointment);
+        }
+
     }
 }

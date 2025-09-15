@@ -65,5 +65,12 @@ namespace AppointmentService.Controllers
             await _service.DeleteAsync(id);
             return Ok("Appointment deleted");
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Cancel(Guid id)
+        {
+            await _service.CancelAppointment(id);
+            return Ok("Appointment cancelled");
+        }
     }
 }
