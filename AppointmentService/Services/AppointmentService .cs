@@ -41,5 +41,22 @@ namespace AppointmentService.Services
         {
             await _repository.DeleteAsync(id);
         }
+
+        public async Task<List<AppointmentDTO>> GetMyAppointments(Guid userid, string role)
+        {
+            if (role == "DOCTOR")
+            {
+                List<Appointment> appointments = await _repository.GetByExpression(a => a.DoctorId == userid);
+                return _mapper.Map<List<AppointmentDTO>>(appointments);
+            }
+
+            if (role == "PATIENT")
+            {
+                List<Appointment> appointments = await _repository.GetByExpression(a => a.PatientId == userid);
+                return _mapper.Map<List<AppointmentDTO>>(appointments);
+            }
+
+            return new List<AppointmentDTO>();
+        }
     }
 }

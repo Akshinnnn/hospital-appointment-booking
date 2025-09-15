@@ -21,7 +21,7 @@ namespace AppointmentService.Migrations
                     ScheduleId = table.Column<Guid>(type: "uuid", nullable: false),
                     AppointmentTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Status = table.Column<int>(type: "integer", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
                     Notes = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>

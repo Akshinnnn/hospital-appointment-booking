@@ -25,6 +25,21 @@ namespace AppointmentService.Controllers
             return Ok(result);
         }
 
+        [HttpGet("myappointments")]
+        public async Task<IActionResult> GetMyAppointments()
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var guid))
+                return Unauthorized("Invalid token");
+
+            var role = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value;
+            if (string.IsNullOrWhiteSpace(role))
+                return Unauthorized("Invalid token");
+
+            var appointments = await _service.GetMyAppointments(guid, role);
+            return Ok(appointments);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
@@ -32,6 +47,7 @@ namespace AppointmentService.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "PATIENT")]
         [HttpPost]
         public async Task<IActionResult> Create(AppointmentCreateDTO dto)
         {

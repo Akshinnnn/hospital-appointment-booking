@@ -2,9 +2,9 @@ namespace AppointmentService.Models.Entities
 {
     public enum AppointmentStatus
     {
-        Pending,
-        Approved,
-        Cancelled,
-        Completed
+        PENDING,
+        APPROVED,
+        CANCELLED,
+        COMPLETED
     }
 }

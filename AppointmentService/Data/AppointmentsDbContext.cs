@@ -16,7 +16,7 @@ public class AppointmentsDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        
+
         var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
             v => v.ToUniversalTime(),  // Convert to UTC before saving to the database
             v => DateTime.SpecifyKind(v, DateTimeKind.Utc) // Set the kind to UTC when reading from the database
@@ -32,7 +32,10 @@ public class AppointmentsDbContext : DbContext
                 }
             }
         }
+        
+        modelBuilder.Entity<Appointment>()
+        .Property(a => a.Status)
+        .HasDefaultValue(AppointmentStatus.PENDING);
 
-        modelBuilder.Entity<Appointment>().Property(a => a.Status);
     }
 }

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AppointmentService.Migrations
 {
     [DbContext(typeof(AppointmentsDbContext))]
-    [Migration("20250804173710_InitialMigration")]
+    [Migration("20250913151614_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -50,7 +50,9 @@ namespace AppointmentService.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<int>("Status")
-                        .HasColumnType("integer");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
 
                     b.HasKey("Id");
 

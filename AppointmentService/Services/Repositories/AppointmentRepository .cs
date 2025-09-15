@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AppointmentService.Data;
 using AppointmentService.Models.Entities;
@@ -35,6 +36,11 @@ namespace AppointmentService.Services.Repositories
             if (entity == null) return;
             _context.Appointments.Remove(entity);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<Appointment>> GetByExpression(Expression<Func<Appointment, bool>> expression)
+        {
+            return await _context.Appointments.Where(expression).ToListAsync();
         }
     }
 }

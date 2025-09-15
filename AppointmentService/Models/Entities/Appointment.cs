@@ -29,7 +29,7 @@ namespace AppointmentService.Models.Entities
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [Required]
-        public AppointmentStatus Status { get; set; } = AppointmentStatus.Pending;
+        public AppointmentStatus Status { get; set; } = AppointmentStatus.PENDING;
 
         public string? Notes { get; set; }
         
