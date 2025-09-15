@@ -32,10 +32,14 @@ public class AppointmentsDbContext : DbContext
                 }
             }
         }
-        
+
         modelBuilder.Entity<Appointment>()
         .Property(a => a.Status)
         .HasDefaultValue(AppointmentStatus.APPROVED);
+        
+        modelBuilder.Entity<Appointment>()
+        .HasIndex(a => new { a.DoctorId, a.AppointmentTime })
+        .IsUnique();
 
     }
 }

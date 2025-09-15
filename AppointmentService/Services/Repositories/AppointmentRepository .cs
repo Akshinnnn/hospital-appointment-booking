@@ -26,8 +26,15 @@ namespace AppointmentService.Services.Repositories
 
         public async Task CreateAsync(Appointment appointment)
         {
-            await _context.Appointments.AddAsync(appointment);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.Appointments.AddAsync(appointment);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("duplicate") == true)
+            {
+                throw new InvalidOperationException("This appointment slot is already taken.", ex);
+            }
         }
 
         public async Task DeleteAsync(Guid id)

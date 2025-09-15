@@ -29,13 +29,24 @@ namespace AppointmentService.Services
             return _mapper.Map<AppointmentDTO>(appointment);
         }
 
-        public async Task<Appointment> CreateAsync(AppointmentCreateDTO dto, Guid guid)
+        public async Task<Appointment> CreateAsync(AppointmentCreateDTO dto, Guid patientId)
         {
+            var existing = await _repository.GetByExpression(a =>
+                a.DoctorId == dto.DoctorId &&
+                a.AppointmentTime == dto.AppointmentTime &&
+                a.Status != AppointmentStatus.CANCELLED);
+
+            if (existing.Any())
+                throw new InvalidOperationException("This appointment time is already taken.");
+
             var entity = _mapper.Map<Appointment>(dto);
-            entity.PatientId = guid;
+            entity.PatientId = patientId;
+            entity.Status = AppointmentStatus.APPROVED;
+
             await _repository.CreateAsync(entity);
             return entity;
         }
+
 
         public async Task DeleteAsync(Guid id)
         {
