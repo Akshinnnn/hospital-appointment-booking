@@ -15,7 +15,7 @@ namespace UserService.Services.Repositories
         Task UpdateAsync(DoctorSchedule schedule);
         Task DeleteAsync(DoctorSchedule schedule);
         Task<bool> ExistsAsync(Guid doctorId, DayOfWeek dayOfWeek, TimeSpan start, TimeSpan end);
-        Task<List<DoctorSchedule>> GetSchedules(Guid doctorId);
+        Task<DoctorSchedule> GetSchedule(Guid doctorId, DateTime date);
         Task<DoctorSchedule> GetScheduleById(Guid id);
     }
 
@@ -51,11 +51,10 @@ namespace UserService.Services.Repositories
             return await _dbContext.Doctor_Schedules.FirstOrDefaultAsync(d => d.Id == id);
         }
 
-        public async Task<List<DoctorSchedule>> GetSchedules(Guid doctorId)
+        public async Task<DoctorSchedule> GetSchedule(Guid doctorId, DateTime date)
         {
             return await _dbContext.Doctor_Schedules
-            .Where(s => s.Doctor_Id == doctorId)
-            .ToListAsync();
+            .FirstOrDefaultAsync(s => s.Doctor_Id == doctorId && s.Day_Of_Week == date.DayOfWeek);
         }
 
         public async Task UpdateAsync(DoctorSchedule schedule)

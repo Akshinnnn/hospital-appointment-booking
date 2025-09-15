@@ -44,11 +44,11 @@ public class ScheduleController : ControllerBase
     // GET: api/{doctorId}/schedule
     [AllowAnonymous]
     [HttpGet("{doctorId}/schedule")]
-    public async Task<IActionResult> GetSchedules(Guid doctorId)
+    public async Task<IActionResult> GetSchedules(Guid doctorId, [FromQuery] DateTime date)
     {
         try
         {
-            var schedule = await _scheduleService.GetSchedules(doctorId);
+            var schedule = await _scheduleService.GetSchedules(doctorId, date);
             return Ok(schedule);
         }
         catch (Exception ex)

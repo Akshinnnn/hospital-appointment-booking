@@ -53,17 +53,35 @@ public class ScheduleService : IScheduleService
         return schedule;
     }
 
-    public async Task<List<ScheduleDTO>> GetSchedules(Guid doctorId)
+    public async Task<List<TimeSlotDTO>> GetSchedules(Guid doctorId, DateTime date)
     {
         if (doctorId == Guid.Empty)
-        throw new ArgumentException("Doctor ID is required");
+            throw new ArgumentException("Doctor ID is required");
 
-        var schedules = await _scheduleRepository.GetSchedules(doctorId);
+        var schedule = await _scheduleRepository.GetSchedule(doctorId, date);
 
-        if (schedules == null || schedules.Count == 0)
-            return new List<ScheduleDTO>();
+        if (schedule == null)
+            return new List<TimeSlotDTO>();
 
-        return _mapper.Map<List<ScheduleDTO>>(schedules);
+        var slots = new List<TimeSlotDTO>();
+        var start = date.Date.Add(schedule.Start_Time);
+        var end = date.Date.Add(schedule.End_Time);
+
+        while (start < end)
+        {
+            var slotEnd = start.AddMinutes(30);
+
+            slots.Add(new TimeSlotDTO
+            {
+                Start = start,
+                End = slotEnd,
+                IsAvailable = true
+            });
+
+            start = slotEnd;
+        }
+
+        return slots;
     }
 
     public async Task<ScheduleDTO> GetScheduleById(Guid scheduleId)
