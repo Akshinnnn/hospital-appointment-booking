@@ -53,6 +53,9 @@ namespace AppointmentService.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DoctorId", "AppointmentTime")
+                        .IsUnique();
+
                     b.ToTable("Appointments");
                 });
 

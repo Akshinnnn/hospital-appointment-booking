@@ -43,6 +43,12 @@ namespace AppointmentService.Migrations
                 {
                     table.PrimaryKey("PK_Doctor_Schedules", x => x.Id);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Appointments_DoctorId_AppointmentTime",
+                table: "Appointments",
+                columns: new[] { "DoctorId", "AppointmentTime" },
+                unique: true);
         }
 
         /// <inheritdoc />
