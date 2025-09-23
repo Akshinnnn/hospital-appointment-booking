@@ -12,6 +12,21 @@ namespace UserService.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Slots",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    DoctorId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Start = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    End = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsAvailable = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Slots", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -34,9 +49,8 @@ namespace UserService.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Doctor_Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Day_Of_Week = table.Column<int>(type: "integer", nullable: false),
-                    Start_Time = table.Column<TimeSpan>(type: "interval", nullable: false),
-                    End_Time = table.Column<TimeSpan>(type: "interval", nullable: false)
+                    Start_Time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    End_Time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -66,6 +80,9 @@ namespace UserService.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Doctor_Schedules");
+
+            migrationBuilder.DropTable(
+                name: "Slots");
 
             migrationBuilder.DropTable(
                 name: "Users");

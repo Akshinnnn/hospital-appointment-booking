@@ -1,10 +1,10 @@
 using System.Text;
 using AppointmentService.Data;
+using AppointmentService.Messaging;
 using AppointmentService.Services;
 using AppointmentService.Services.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +16,8 @@ builder.Services.AddDbContext<AppointmentsDbContext>(options =>
 builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 
 builder.Services.AddScoped<IAppointmentService, AppointmentService.Services.AppointmentService>();
+
+builder.Services.AddSingleton<IRabbitMqProducer, RabbitMqProducer>();
 
 builder.Services.AddAutoMapper(typeof(Program));
 

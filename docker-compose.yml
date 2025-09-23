@@ -1,14 +1,14 @@
-version: '3.9'
 services:
-
   apigateway:
     build:
       context: ./ApiGateway
     ports:
       - "8080:8080"
     depends_on:
-      - userservice
-      - appointmentservice
+      userservice:
+        condition: service_started
+      appointmentservice:
+        condition: service_started
     networks:
       default: {}
 
@@ -21,8 +21,7 @@ services:
     ports:
       - 8081:8080
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
     networks:
       default: {}
 
@@ -35,8 +34,7 @@ services:
     ports:
       - 8082:8080
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
     networks:
       default: {}
 
@@ -48,29 +46,56 @@ services:
       - 5432:5432
     volumes:
       - pgdata:/var/lib/postgresql/data/
-    networks:
-      default: {}
+    environment:
+    - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    networks:
+      default: {}
 
-  # kafka:
-  #   image: confluentinc/cp-kafka:7.4.0
-  #   environment:
-  #     KAFKA_BROKER_ID: 1
-  #     KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-  #     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-  #   depends_on:
-  #     - zookeeper
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"     # AMQP (for services)
+      - "15672:15672"   # Management UI (http://localhost:15672, user: guest / guest)
+    networks:
+      default: {}
 
   # zookeeper:
-  #   image: confluentinc/cp-zookeeper:7.4.0
+  #   image: confluentinc/cp-zookeeper:7.3.2
+  #   container_name: zookeeper
   #   environment:
   #     ZOOKEEPER_CLIENT_PORT: 2181
   #     ZOOKEEPER_TICK_TIME: 2000
+  #   networks:
+  #     - default
+
+  # kafka:
+  #   image: confluentinc/cp-kafka:7.3.2
+  #   container_name: kafka
+  #   ports:
+  #     - "9092:9092"
+  #   depends_on:
+  #     - zookeeper
+  #   environment:
+  #     KAFKA_BROKER_ID: 1
+  #     KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+  #     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_INTERNAL://kafka:29092
+  #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+  #     KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  #     KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true" # Leave this as true for now
+  #   healthcheck:
+  #     test: ["CMD", "kafka-topics", "--list", "--bootstrap-server", "kafka:9092"]
+  #     interval: 10s
+  #     timeout: 10s
+  #     retries: 10
+  #   networks:
+  #     - default
 
 volumes:
   pgdata:

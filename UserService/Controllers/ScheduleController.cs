@@ -1,11 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using UserService.Models.ScheduleDTOs;
 using UserService.Services;
 
@@ -44,12 +38,13 @@ public class ScheduleController : ControllerBase
     // GET: api/{doctorId}/schedule
     [AllowAnonymous]
     [HttpGet("{doctorId}/schedule")]
-    public async Task<IActionResult> GetSchedules(Guid doctorId, [FromQuery] DateTime date)
+    public async Task<IActionResult> GetSlots(Guid doctorId, [FromQuery] DateTime date)
     {
         try
         {
-            var schedule = await _scheduleService.GetSchedules(doctorId, date);
-            return Ok(schedule);
+            var dateUtc = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+            var slots = await _scheduleService.GetSlots(doctorId, dateUtc);
+            return Ok(slots);
         }
         catch (Exception ex)
         {

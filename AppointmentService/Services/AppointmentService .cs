@@ -44,6 +44,7 @@ namespace AppointmentService.Services
             entity.Status = AppointmentStatus.APPROVED;
 
             await _repository.CreateAsync(entity);
+
             return entity;
         }
 

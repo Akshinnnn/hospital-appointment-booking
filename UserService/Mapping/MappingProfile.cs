@@ -17,5 +17,7 @@ public class MappingProfile : Profile
 
         CreateMap<ScheduleDTO, DoctorSchedule>().ReverseMap();
         CreateMap<AddScheduleDTO, DoctorSchedule>().ReverseMap();
+
+        CreateMap<Slot, TimeSlotDTO>().ReverseMap();
     }
 }

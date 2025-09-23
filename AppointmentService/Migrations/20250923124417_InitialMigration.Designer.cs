@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AppointmentService.Migrations
 {
     [DbContext(typeof(AppointmentsDbContext))]
-    [Migration("20250916105807_InitialMigration")]
+    [Migration("20250923124417_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -46,9 +46,6 @@ namespace AppointmentService.Migrations
                     b.Property<Guid>("PatientId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ScheduleId")
-                        .HasColumnType("uuid");
-
                     b.Property<int>("Status")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
@@ -60,29 +57,6 @@ namespace AppointmentService.Migrations
                         .IsUnique();
 
                     b.ToTable("Appointments");
-                });
-
-            modelBuilder.Entity("AppointmentService.Models.Entities.DoctorSchedule", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Day_Of_Week")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("Doctor_Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<TimeSpan>("End_Time")
-                        .HasColumnType("interval");
-
-                    b.Property<TimeSpan>("Start_Time")
-                        .HasColumnType("interval");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Doctor_Schedules");
                 });
 #pragma warning restore 612, 618
         }

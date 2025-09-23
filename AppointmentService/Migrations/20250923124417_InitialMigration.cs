@@ -18,7 +18,6 @@ namespace AppointmentService.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     DoctorId = table.Column<Guid>(type: "uuid", nullable: false),
                     PatientId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ScheduleId = table.Column<Guid>(type: "uuid", nullable: false),
                     AppointmentTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
@@ -27,21 +26,6 @@ namespace AppointmentService.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Appointments", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Doctor_Schedules",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Doctor_Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Day_Of_Week = table.Column<int>(type: "integer", nullable: false),
-                    Start_Time = table.Column<TimeSpan>(type: "interval", nullable: false),
-                    End_Time = table.Column<TimeSpan>(type: "interval", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Doctor_Schedules", x => x.Id);
                 });
 
             migrationBuilder.CreateIndex(
@@ -56,9 +40,6 @@ namespace AppointmentService.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Appointments");
-
-            migrationBuilder.DropTable(
-                name: "Doctor_Schedules");
         }
     }
 }

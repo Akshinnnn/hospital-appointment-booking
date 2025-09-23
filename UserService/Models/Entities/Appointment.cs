@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace AppointmentService.Models.Entities
+namespace UserService.Models.Entities
 {
     [Table("Appointments")]
     public class Appointment
@@ -14,6 +14,9 @@ namespace AppointmentService.Models.Entities
 
         [Required]
         public Guid PatientId { get; set; }
+
+        [Required]
+        public Guid ScheduleId { get; set; }
 
         [Required]
         public DateTime AppointmentTime { get; set; }

@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using MassTransit;
-using UserService.Models.DTOs;
 using UserService.Models.Entities;
 using UserService.Models.ScheduleDTOs;
 
@@ -15,6 +9,7 @@ namespace UserService.Services
         Task<DoctorSchedule> AddSchedule(Guid doctorId, AddScheduleDTO dto);
         Task RemoveSchedule(Guid scheduleId);
         Task UpdateSchedule(Guid guid, ScheduleDTO dto);
-        Task<List<TimeSlotDTO>> GetSchedules(Guid doctorId, DateTime date);
+        Task<List<TimeSlotDTO>> GetSlots(Guid doctorId, DateTime date);
+        Task BlockSlotAsync(Guid doctorId, DateTime appointmentTime);
     }
 }

@@ -28,23 +28,43 @@ namespace UserService.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("Day_Of_Week")
-                        .HasColumnType("integer");
-
                     b.Property<Guid>("Doctor_Id")
                         .HasColumnType("uuid");
 
-                    b.Property<TimeSpan>("End_Time")
-                        .HasColumnType("interval");
+                    b.Property<DateTime>("End_Time")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<TimeSpan>("Start_Time")
-                        .HasColumnType("interval");
+                    b.Property<DateTime>("Start_Time")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Doctor_Id");
 
                     b.ToTable("Doctor_Schedules");
+                });
+
+            modelBuilder.Entity("UserService.Models.Entities.Slot", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("DoctorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("End")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsAvailable")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("Start")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Slots");
                 });
 
             modelBuilder.Entity("UserService.Models.Entities.User", b =>
