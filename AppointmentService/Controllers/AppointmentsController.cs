@@ -12,12 +12,10 @@ namespace AppointmentService.Controllers
     public class AppointmentsController : ControllerBase
     {
         private readonly IAppointmentService _service;
-        private readonly IRabbitMqProducer _producer;
 
-        public AppointmentsController(IAppointmentService service, IRabbitMqProducer producer)
+        public AppointmentsController(IAppointmentService service)
         {
             _service = service;
-            _producer = producer;
         }
 
         [HttpGet]
@@ -58,8 +56,6 @@ namespace AppointmentService.Controllers
                 return Unauthorized("Invalid token");
 
             var entity = await _service.CreateAsync(dto, guid);
-
-            _producer.Publish("appointment-created", entity);
             
             return Ok(entity);
         }
@@ -75,6 +71,7 @@ namespace AppointmentService.Controllers
         public async Task<IActionResult> Cancel(Guid id)
         {
             await _service.CancelAppointment(id);
+
             return Ok("Appointment cancelled");
         }
     }

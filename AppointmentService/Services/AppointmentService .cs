@@ -1,3 +1,4 @@
+using AppointmentService.Messaging;
 using AppointmentService.Models.DTOs.AppointmentDTOs;
 using AppointmentService.Models.Entities;
 using AppointmentService.Services.Repositories;
@@ -10,10 +11,13 @@ namespace AppointmentService.Services
         private readonly IAppointmentRepository _repository;
         private readonly IMapper _mapper;
 
-        public AppointmentService(IAppointmentRepository repository, IMapper mapper)
+        private readonly IRabbitMqProducer _producer;
+
+        public AppointmentService(IAppointmentRepository repository, IMapper mapper, IRabbitMqProducer producer)
         {
             _repository = repository;
             _mapper = mapper;
+            _producer = producer;
         }
 
         public async Task<List<AppointmentDTO>> GetAllAsync()
@@ -45,6 +49,8 @@ namespace AppointmentService.Services
 
             await _repository.CreateAsync(entity);
 
+            _producer.Publish("appointment-created", entity);
+
             return entity;
         }
 
@@ -75,7 +81,9 @@ namespace AppointmentService.Services
         {
             var appointment = await _repository.GetByIdAsync(id) ?? throw new KeyNotFoundException("Appointment not found");
             appointment.Status = AppointmentStatus.CANCELLED;
+
             await _repository.UpdateAsync(appointment);
+            _producer.Publish("appointment-cancelled", appointment);
         }
 
     }
