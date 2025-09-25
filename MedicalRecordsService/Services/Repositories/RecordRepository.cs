@@ -2,32 +2,43 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MedicalRecordsService.Data;
 using MedicalRecordsService.Models;
 
 namespace MedicalRecordsService.Services.Repositories
 {
     public interface IRecordRepository
     {
-        Task AddAsync(Record user);
-        Task UpdateAsync(Record user);
-        Task DeleteAsync(Record user);
+        Task AddAsync(Record record);
+        Task UpdateAsync(Record record);
+        Task DeleteAsync(Record record);
     }
 
     public class RecordRepository : IRecordRepository
     {
-        public Task AddAsync(Record user)
+        private readonly RecordDbContext _dbContext;
+
+        public RecordRepository(RecordDbContext dbContext)
         {
-            throw new NotImplementedException();
+            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
-        public Task DeleteAsync(Record user)
+        public async Task AddAsync(Record record)
         {
-            throw new NotImplementedException();
+            await _dbContext.Records.AddAsync(record);
+            await _dbContext.SaveChangesAsync();
         }
 
-        public Task UpdateAsync(Record user)
+        public async Task DeleteAsync(Record record)
         {
-            throw new NotImplementedException();
+            _dbContext.Records.Remove(record);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(Record record)
+        {
+            _dbContext.Records.Update(record);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
