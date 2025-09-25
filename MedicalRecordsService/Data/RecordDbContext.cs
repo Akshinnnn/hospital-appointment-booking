@@ -1,0 +1,16 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using MedicalRecordsService.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace MedicalRecordsService.Data
+{
+    public class RecordDbContext : DbContext
+    {
+        public DbSet<Record> Records { get; set; }
+
+        public RecordDbContext(DbContextOptions<RecordDbContext> options) : base(options) {}
+    }
+}
