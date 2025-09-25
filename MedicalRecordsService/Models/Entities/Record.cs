@@ -20,10 +20,10 @@ namespace MedicalRecordService.Models
 
         [Required]
         [MaxLength(200)]
-        public string Title { get; set; } 
+        public string? Title { get; set; } 
 
         [MaxLength(500)]
-        public string Description { get; set; } 
+        public string? Description { get; set; } 
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
