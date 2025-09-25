@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MedicalRecordsService.Models;
+using MedicalRecordService.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace MedicalRecordsService.Data
+namespace MedicalRecordService.Data
 {
     public class RecordDbContext : DbContext
     {

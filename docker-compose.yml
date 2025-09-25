@@ -38,6 +38,19 @@ services:
     networks:
       default: {}
 
+  medicalrecordservice:
+    image: ${PROJECT_NAME}_medicalrecord
+    container_name: ${PROJECT_NAME}_medicalrecord
+    build:
+      context: ./MedicalRecordsService
+    restart: unless-stopped
+    ports:
+      - 8083:8080
+    depends_on:
+      - postgres
+    networks:
+      default: {}
+
   postgres:
     image: postgres:14.2
     container_name: ${PROJECT_NAME}_db
@@ -60,8 +73,8 @@ services:
     image: rabbitmq:3-management
     container_name: rabbitmq
     ports:
-      - "5672:5672"     # AMQP (for services)
-      - "15672:15672"   # Management UI (http://localhost:15672, user: guest / guest)
+      - "5672:5672"     
+      - "15672:15672"   
     networks:
       default: {}
 

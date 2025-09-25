@@ -1,6 +1,6 @@
 using AutoMapper;
 
-namespace MedicalRecordsService.Mapping;
+namespace MedicalRecordService.Mapping;
 
 public class MappingProfile : Profile
 {

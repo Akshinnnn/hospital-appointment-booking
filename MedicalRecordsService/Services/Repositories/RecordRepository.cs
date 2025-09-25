@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MedicalRecordsService.Data;
-using MedicalRecordsService.Models;
+using MedicalRecordService.Data;
+using MedicalRecordService.Models;
 
-namespace MedicalRecordsService.Services.Repositories
+namespace MedicalRecordService.Services.Repositories
 {
     public interface IRecordRepository
     {
