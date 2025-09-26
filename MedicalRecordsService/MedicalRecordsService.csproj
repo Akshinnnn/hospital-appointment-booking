@@ -17,6 +17,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.7" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.Design" Version="1.1.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference Include="Google.Cloud.Storage.V1" Version="4.13.0" />
   </ItemGroup>
 
 </Project>
