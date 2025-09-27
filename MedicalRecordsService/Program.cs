@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Google.Cloud.Storage.V1;
@@ -7,6 +8,7 @@ using MedicalRecordsService.GoogleCloudConfiguration;
 using MedicalRecordsService.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
@@ -30,13 +32,47 @@ builder.Services.AddScoped<IRecordService, RecordService>();
 builder.Services.AddScoped<IRecordRepository, RecordRepository>();
 builder.Services.AddAutoMapper(typeof(Program));
 
+builder.Services.AddAuthorization();
+
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.Authority = builder.Configuration["JwtSettings:Issuer"];
+        options.RequireHttpsMetadata = false;
+        options.Audience = builder.Configuration["JwtSettings:Audience"];
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+            ValidAudience = builder.Configuration["JwtSettings:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Secret"]))
+        };
+    });
+
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<RecordDbContext>();
+    db.Database.Migrate(); 
+}
 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseHttpsRedirection();
 }
 
-app.UseHttpsRedirection();
+app.MapGet("/", () => "MedicalRecordService is running.");
+
+app.MapControllers();
+
+app.UseAuthentication();  
+app.UseAuthorization(); 
 
 app.Run();
