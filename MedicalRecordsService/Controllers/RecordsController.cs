@@ -2,10 +2,12 @@ using MedicalRecordService.Models.DTOs;
 using MedicalRecordService.Services;
 using MedicalRecordsService.Models.DTOs;
 using MedicalRecordsService.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MedicalRecordService.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/medicalrecords")]
     public class RecordsController : ControllerBase
