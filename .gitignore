@@ -32,6 +32,7 @@ wwwroot/
 appsettings.Development.json
 appsettings.Production.json
 appsettings.*.json
+quick-cache-473310-f4-5565c9888d56.json
 
 # Sensitive Files
 secrets.json
