@@ -10,11 +10,7 @@ namespace MedicalRecordService.Models.DTOs
     public class AddRecordDTO
     {
         public Guid Patient_Id { get; set; }
-
-        public Guid Doctor_Id { get; set; }
-
         public string? Title { get; set; } = default!;
-
         public string? Description { get; set; } 
         public IFormFile File { get; set; } = default!;
     }

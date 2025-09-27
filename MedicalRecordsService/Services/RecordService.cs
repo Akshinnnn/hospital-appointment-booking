@@ -28,7 +28,7 @@ namespace MedicalRecordsService.Services
             _mapper = mapper;
         }
 
-        public async Task<Record> AddRecord(AddRecordDTO dto)
+        public async Task<Record> AddRecord(Guid id, AddRecordDTO dto)
         {
             if (dto.File == null || dto.File.Length == 0)
                 throw new ArgumentException("File is required");
@@ -47,7 +47,7 @@ namespace MedicalRecordsService.Services
                 var record = new Record
                 {
                     Patient_Id = dto.Patient_Id,
-                    Doctor_Id = dto.Doctor_Id,
+                    Doctor_Id = id,
                     Title = dto.Title,
                     Description = dto.Description,
                     FilePath = $"https://storage.googleapis.com/{_options.BucketName}/{fileName}",

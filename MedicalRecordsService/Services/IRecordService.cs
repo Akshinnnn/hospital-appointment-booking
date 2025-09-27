@@ -10,7 +10,7 @@ namespace MedicalRecordsService.Services
 {
     public interface IRecordService
     {
-        Task<Record> AddRecord(AddRecordDTO dto);
+        Task<Record> AddRecord(Guid id, AddRecordDTO dto);
         Task<Record?> GetById(Guid id);
         Task<Record> Update(Guid id, UpdateRecordDTO dto);
         Task Delete(Guid id);

@@ -9,7 +9,7 @@ namespace MedicalRecordService.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("api/medicalrecords")]
+    [Route("api/records")]
     public class RecordsController : ControllerBase
     {
         private readonly IRecordService _service;
@@ -19,15 +19,20 @@ namespace MedicalRecordService.Controllers
             _service = service;
         }
 
+        [Authorize(Roles = "DOCTOR, ADMIN")]
         [HttpPost]
         public async Task<IActionResult> Upload([FromForm] AddRecordDTO dto)
         {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var guid))
+                return Unauthorized("Invalid token");
+
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
-                var record = await _service.AddRecord(dto);
+                var record = await _service.AddRecord(guid, dto);
                 return CreatedAtAction(
                     nameof(GetById),
                     new { id = record.Id },
@@ -49,6 +54,7 @@ namespace MedicalRecordService.Controllers
             return Ok(record);
         }
 
+        [Authorize(Roles = "DOCTOR, ADMIN")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
@@ -67,6 +73,7 @@ namespace MedicalRecordService.Controllers
             }
         }
 
+        [Authorize(Roles = "DOCTOR, ADMIN")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateRecordDTO dto)
         {
