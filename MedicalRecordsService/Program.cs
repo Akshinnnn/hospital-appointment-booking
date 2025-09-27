@@ -54,6 +54,8 @@ builder.Services.AddAuthentication("Bearer")
         };
     });
 
+builder.Services.AddEndpointsApiExplorer();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())

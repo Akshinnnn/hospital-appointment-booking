@@ -9,6 +9,8 @@ services:
         condition: service_started
       appointmentservice:
         condition: service_started
+      medicalrecordservice:
+        condition: service_started
     networks:
       default: {}
 
