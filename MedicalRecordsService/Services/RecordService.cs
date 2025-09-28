@@ -66,7 +66,20 @@ namespace MedicalRecordsService.Services
 
         public async Task<Record?> GetById(Guid id)
         {
-            return await _repository.GetByIdAsync(id);
+            var record = await _repository.GetByIdAsync(id);
+            if (record == null) return null;
+
+            var objectName = Path.GetFileName(record.FilePath);
+
+            var urlSigner = UrlSigner.FromServiceAccountPath(_options.CredentialsPath);
+            var signedUrl = urlSigner.Sign(
+                _options.BucketName,
+                objectName,
+                TimeSpan.FromMinutes(15), 
+                HttpMethod.Get);
+
+            record.FilePath = signedUrl; 
+            return record;
         }
 
         public async Task<Record> Update(Guid id, UpdateRecordDTO dto)
