@@ -7,25 +7,25 @@ namespace AppointmentService.Services.Repositories
 {
     public class AppointmentRepository : IAppointmentRepository
     {
-        private readonly AppointmentsDbContext _context;
+        private readonly AppointmentsDbContext _dbContext;
 
-        public AppointmentRepository(AppointmentsDbContext context)
+        public AppointmentRepository(AppointmentsDbContext dbContext)
         {
-            _context = context;
+            _dbContext = dbContext;
         }
 
         public async Task<List<Appointment>> GetAllAsync() =>
-            await _context.Appointments.ToListAsync();
+            await _dbContext.Appointments.ToListAsync();
 
         public async Task<Appointment?> GetByIdAsync(Guid id) =>
-            await _context.Appointments.FirstOrDefaultAsync(a => a.Id == id);
+            await _dbContext.Appointments.FirstOrDefaultAsync(a => a.Id == id);
 
         public async Task CreateAsync(Appointment appointment)
         {
             try
             {
-                await _context.Appointments.AddAsync(appointment);
-                await _context.SaveChangesAsync();
+                await _dbContext.Appointments.AddAsync(appointment);
+                await _dbContext.SaveChangesAsync();
             }
             catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("duplicate") == true)
             {
@@ -35,21 +35,21 @@ namespace AppointmentService.Services.Repositories
 
         public async Task DeleteAsync(Guid id)
         {
-            var entity = await _context.Appointments.FindAsync(id);
+            var entity = await _dbContext.Appointments.FindAsync(id);
             if (entity == null) return;
-            _context.Appointments.Remove(entity);
-            await _context.SaveChangesAsync();
+            _dbContext.Appointments.Remove(entity);
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task<List<Appointment>> GetByExpression(Expression<Func<Appointment, bool>> expression)
         {
-            return await _context.Appointments.Where(expression).ToListAsync();
+            return await _dbContext.Appointments.Where(expression).ToListAsync();
         }
 
         public async Task UpdateAsync(Appointment appointment)
         {
-            _context.Appointments.Update(appointment);
-            await _context.SaveChangesAsync();
+            _dbContext.Appointments.Update(appointment);
+            await _dbContext.SaveChangesAsync();
         }   
     }
 }

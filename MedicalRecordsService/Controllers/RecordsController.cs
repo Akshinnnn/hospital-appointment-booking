@@ -94,5 +94,21 @@ namespace MedicalRecordService.Controllers
                 return StatusCode(500, new { message = "Failed to update record", error = ex.Message });
             }
         }
+
+        [Authorize(Roles = "DOCTOR, PATIENT")]
+        [HttpGet("myrecords")]
+        public async Task<IActionResult> GetMyRecords()
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var guid))
+                return Unauthorized("Invalid token");
+
+            var role = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value;
+            if (string.IsNullOrWhiteSpace(role))
+                return Unauthorized("Invalid token");
+
+            var records = await _service.GetMyRecords(guid, role);
+            return Ok(records);
+        }
     }
 }

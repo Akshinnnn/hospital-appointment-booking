@@ -12,6 +12,7 @@ namespace MedicalRecordsService.Services
     {
         Task<Record> AddRecord(Guid id, AddRecordDTO dto);
         Task<Record?> GetById(Guid id);
+        Task<List<Record>> GetMyRecords(Guid userId, string role);
         Task<Record> Update(Guid id, UpdateRecordDTO dto);
         Task Delete(Guid id);
     }

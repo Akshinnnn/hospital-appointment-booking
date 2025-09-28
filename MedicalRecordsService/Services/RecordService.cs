@@ -121,5 +121,22 @@ namespace MedicalRecordsService.Services
                 throw new InvalidOperationException("Failed to delete record", ex);
             }
         }
+
+        public async Task<List<Record>> GetMyRecords(Guid userId, string role)
+        {
+            if (role == "DOCTOR")
+            {
+                List<Record> records = await _repository.GetByExpression(r => r.Doctor_Id == userId);
+                return records;
+            }
+
+            if (role == "PATIENT")
+            {
+                List<Record> records = await _repository.GetByExpression(r => r.Patient_Id == userId);
+                return records;
+            }
+
+            return new List<Record>();
+        }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using MedicalRecordService.Data;
 using MedicalRecordService.Models;
@@ -15,6 +16,7 @@ namespace MedicalRecordService.Services.Repositories
         Task DeleteAsync(Record record);
         Task<bool> ExistsAsync(Guid id);
         Task<Record> GetByIdAsync(Guid id);
+        Task<List<Record>> GetByExpression(Expression<Func<Record, bool>> expression);
     }
 
     public class RecordRepository : IRecordRepository
@@ -53,6 +55,11 @@ namespace MedicalRecordService.Services.Repositories
         public async Task<Record> GetByIdAsync(Guid id)
         {
             return await _dbContext.Records.FirstOrDefaultAsync(r => r.Id == id);
+        }
+
+        public async Task<List<Record>> GetByExpression(Expression<Func<Record, bool>> expression)
+        {
+            return await _dbContext.Records.Where(expression).ToListAsync();
         }
     }
 }
