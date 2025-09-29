@@ -33,6 +33,7 @@ appsettings.Development.json
 appsettings.Production.json
 appsettings.*.json
 quick-cache-473310-f4-5565c9888d56.json
+HospitalBooking.sln
 
 # Sensitive Files
 secrets.json
@@ -110,6 +111,5 @@ Thumbs.db
 *.suo
 
 # Keep essential files
-!appsettings.json
 !docker-compose.yml
 !Dockerfile

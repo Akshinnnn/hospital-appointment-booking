@@ -1,7 +1,7 @@
 services:
   apigateway:
     build:
-      context: ./ApiGateway
+      context: ./backend/ApiGateway
     ports:
       - "8080:8080"
     depends_on:
@@ -18,7 +18,7 @@ services:
     image: ${PROJECT_NAME}_user
     container_name: ${PROJECT_NAME}_user
     build:
-      context: ./UserService
+      context: ./backend/UserService
     restart: unless-stopped
     ports:
       - 8081:8080
@@ -31,7 +31,7 @@ services:
     image: ${PROJECT_NAME}_appointment
     container_name: ${PROJECT_NAME}_appointment
     build:
-      context: ./AppointmentService
+      context: ./backend/AppointmentService
     restart: unless-stopped
     ports:
       - 8082:8080
@@ -44,7 +44,7 @@ services:
     image: ${PROJECT_NAME}_medicalrecord
     container_name: ${PROJECT_NAME}_medicalrecord
     build:
-      context: ./MedicalRecordsService
+      context: ./backend/MedicalRecordsService
     restart: unless-stopped
     ports:
       - 8083:8080
