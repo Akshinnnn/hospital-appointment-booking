@@ -6,8 +6,8 @@ const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
     return (
-        <nav className="bg-white shadow-md">
-            <div className="font-display h-24 items-center px-4 flex justify-between">
+        <nav className="bg-gray-100 shadow-md">
+            <div className="font-semibold h-24 items-center px-4 flex justify-between">
 
                 {/* logo */}
                 <div className="flex items-center ml-14">
@@ -16,11 +16,12 @@ const Navbar = () => {
                 </div>
 
                 {/* buttons desktop */}
-                <div className="hidden sm:block space-x-8">
+                <div className="hidden sm:block space-x-6">
                     <a className="text-gray-800 px-2 py-3 text-xl rounded-xl hover:bg-gray-200" href="/services">Services</a>
                     <a className="text-gray-800 px-2 py-3 text-xl rounded-xl hover:bg-gray-200" href="/doctors">Doctors</a>
                     <a className="text-gray-800 px-2 py-3 text-xl rounded-xl hover:bg-gray-200" href="/about">About</a>
                     <a className="text-gray-800 px-2 py-3 text-xl rounded-xl hover:bg-gray-200" href="/contact">Contact</a>
+                    <a className="text-gray-800 px-2 py-3 text-xl rounded-xl hover:bg-gray-200" href="/contact">FAQ</a>
                 </div>
 
                 {/* login/register */}
@@ -42,7 +43,7 @@ const Navbar = () => {
             </div>
 
             {/* buttons mobile */}
-            <div className={`${isMenuOpen ? "block" : "hidden"} sm:hidden bg-gray-100`}>
+            <div className={`${isMenuOpen ? "block" : "hidden"} sm:hidden absolute top-24 left-0 w-full bg-gray-100 shadow-md z-50`}>
                 <a className="text-center text-gray-800 text-lg px-4 block border-1 border-gray-300 py-2 active:bg-gray-200" href="/services">Services</a>
                 <a className="text-center text-gray-800 text-lg px-4 block border-1 border-gray-300 py-2 active:bg-gray-200" href="/doctors">Doctors</a>
                 <a className="text-center text-gray-800 text-lg px-4 block border-1 border-gray-300 py-2 active:bg-gray-200" href="/about">About</a>
