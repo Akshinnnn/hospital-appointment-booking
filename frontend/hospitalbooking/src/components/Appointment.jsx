@@ -180,7 +180,7 @@ const Appointment = () => {
                 type="submit"
                 className="bg-green-700 hover:bg-green-800 text-white font-semibold py-3 px-10 rounded-xl transition-all"
               >
-                Submit Appointment
+                Submit
               </button>
             </div>
           </form>

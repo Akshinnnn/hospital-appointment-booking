@@ -1,6 +1,7 @@
 import React from "react";
 import doctorbg from "../assets/doctorbg.jpg";
 import Appointment from "./Appointment";
+import FeedbackSection from "./Feedback";
 
 const Home = () => {
   return ( <>
@@ -37,8 +38,7 @@ const Home = () => {
         </div>
       </div>
     </div>
-
-    <Appointment />
+    <FeedbackSection />
     </>
   );
 };
