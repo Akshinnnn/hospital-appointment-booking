@@ -18,10 +18,10 @@ const Navbar = () => {
                 {/* buttons desktop */}
                 <div className="hidden sm:block space-x-6">
                     <a className="text-gray-800 px-2 py-3 text-xl rounded-xl hover:bg-gray-200" href="/services">Services</a>
+                    <a className="text-gray-800 px-2 py-3 text-xl rounded-xl hover:bg-gray-200" href="/contact">Appointment</a>
                     <a className="text-gray-800 px-2 py-3 text-xl rounded-xl hover:bg-gray-200" href="/doctors">Doctors</a>
                     <a className="text-gray-800 px-2 py-3 text-xl rounded-xl hover:bg-gray-200" href="/about">About</a>
                     <a className="text-gray-800 px-2 py-3 text-xl rounded-xl hover:bg-gray-200" href="/contact">Contact</a>
-                    <a className="text-gray-800 px-2 py-3 text-xl rounded-xl hover:bg-gray-200" href="/contact">FAQ</a>
                 </div>
 
                 {/* login/register */}
@@ -45,6 +45,7 @@ const Navbar = () => {
             {/* buttons mobile */}
             <div className={`${isMenuOpen ? "block" : "hidden"} sm:hidden absolute top-24 left-0 w-full bg-gray-100 shadow-md z-50`}>
                 <a className="text-center text-gray-800 text-lg px-4 block border-1 border-gray-300 py-2 active:bg-gray-200" href="/services">Services</a>
+                <a className="text-center text-gray-800 text-lg px-4 block border-1 border-gray-300 py-2 active:bg-gray-200" href="/services">Appointment</a>
                 <a className="text-center text-gray-800 text-lg px-4 block border-1 border-gray-300 py-2 active:bg-gray-200" href="/doctors">Doctors</a>
                 <a className="text-center text-gray-800 text-lg px-4 block border-1 border-gray-300 py-2 active:bg-gray-200" href="/about">About</a>
                 <a className="text-center text-gray-800 text-lg px-4 block border-1 border-gray-300 py-2 active:bg-gray-200" href="/contact">Contact</a>
