@@ -21,13 +21,16 @@ namespace UserService.Models.Entities
         public string? Phone_Number { get; set; }
         [Required]
         public string Password { get; set; }
+
         [Required]
-        public UserRole Role { get; set; }
+        public UserRole Role { get; set; } = UserRole.PATIENT;
+
+        public string? Specialisation { get; set; }
 
         [Required]
         public DateTime Created_At { get; set; }
         
-        public ICollection<DoctorSchedule> Availabilities { get; set; }
+        public ICollection<DoctorSchedule>? Availabilities { get; set; }
 
     }
 }

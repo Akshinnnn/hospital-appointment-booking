@@ -44,8 +44,16 @@ namespace AppointmentService.Services
                 throw new InvalidOperationException("This appointment time is already taken.");
 
             var entity = _mapper.Map<Appointment>(dto);
-            entity.PatientId = patientId;
-            entity.Status = AppointmentStatus.APPROVED;
+            if (patientId == Guid.Empty)
+            {
+                entity.Status = AppointmentStatus.APPROVED;
+            }
+            else
+            {
+                entity.PatientId = patientId;
+                entity.Status = AppointmentStatus.APPROVED;
+            }
+            
 
             await _repository.CreateAsync(entity);
 

@@ -36,6 +36,7 @@ namespace UserService.Migrations
                     Phone_Number = table.Column<string>(type: "text", nullable: true),
                     Password = table.Column<string>(type: "text", nullable: false),
                     Role = table.Column<string>(type: "text", nullable: false),
+                    Specialisation = table.Column<string>(type: "text", nullable: true),
                     Created_At = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
