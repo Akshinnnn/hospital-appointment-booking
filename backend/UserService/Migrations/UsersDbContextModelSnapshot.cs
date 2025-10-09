@@ -97,6 +97,9 @@ namespace UserService.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Specialisation")
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
