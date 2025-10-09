@@ -10,10 +10,15 @@ namespace AppointmentService.Models.Entities
         public Guid Id { get; set; } = Guid.NewGuid();
 
         [Required]
-        public Guid DoctorId { get; set; }
+        public string FullName { get; set; }
 
         [Required]
-        public Guid PatientId { get; set; }
+        public string Email { get; set; }
+
+        [Required]
+        public Guid DoctorId { get; set; }
+
+        public Guid? PatientId { get; set; }
 
         [Required]
         public DateTime AppointmentTime { get; set; }

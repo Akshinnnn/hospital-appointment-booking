@@ -47,13 +47,13 @@ namespace AppointmentService.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "PATIENT")]
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Create(AppointmentCreateDTO dto)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var guid))
-                return Unauthorized("Invalid token");
+                guid = Guid.Empty; 
 
             var entity = await _service.CreateAsync(dto, guid);
             
