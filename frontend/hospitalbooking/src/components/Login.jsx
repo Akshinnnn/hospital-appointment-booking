@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 const LoginPage = () => {
   const [form, setForm] = useState({ email: "", password: "" });
   const navigate = useNavigate();
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -28,6 +28,7 @@ const LoginPage = () => {
       })
       .then((data) => {
         localStorage.setItem("token", data.token);
+        window.dispatchEvent(new Event("authChanged"));
         navigate("/");
       })
       .catch((err) => console.log(err.message));
