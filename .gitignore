@@ -34,6 +34,7 @@ appsettings.Production.json
 appsettings.json
 quick-cache-473310-f4-5565c9888d56.json
 HospitalBooking.sln
+authService.js
 
 # Sensitive Files
 secrets.json
