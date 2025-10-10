@@ -23,7 +23,9 @@ const Appointment = () => {
   // Fetch schedule for selected doctor
   useEffect(() => {
     if (!selectedDoctor) return;
-    const url = `http://localhost:8080/api/${selectedDoctor}/schedule?date=2025-09-25T10:00:00Z`;
+    const today = new Date();
+    const isoDate = today.toISOString(); // e.g. "2025-10-10T12:00:00Z"
+    const url = `http://localhost:8080/api/${selectedDoctor}/schedule?date=${isoDate}`;
 
     fetch(url)
       .then((res) => res.json())
