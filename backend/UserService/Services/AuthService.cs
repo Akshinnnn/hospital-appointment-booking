@@ -30,9 +30,6 @@ public class AuthService : IAuthService
         if (dto == null || string.IsNullOrWhiteSpace(dto.Full_Name) || string.IsNullOrWhiteSpace(dto.Password))
             throw new ArgumentException("Invalid user data");
 
-        if (!Enum.IsDefined(typeof(UserRole), dto.Role))
-            throw new ArgumentException("Invalid role");
-
         var exists = await _userRepository.ExistsAsync(dto.Full_Name, dto.Email);
         if (exists)
             throw new InvalidOperationException("Username or email already exists");

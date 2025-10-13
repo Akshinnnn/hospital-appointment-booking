@@ -13,5 +13,6 @@ namespace UserService.Models.DTOs
         public string Email { get; set; }
         public string? Phone_Number { get; set; }
         public UserRole Role { get; set; }
+        public string? Specialisation { get; set; }
     }
 }
