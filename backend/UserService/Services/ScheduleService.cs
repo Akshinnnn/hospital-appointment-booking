@@ -78,6 +78,7 @@ public class ScheduleService : IScheduleService
         }
 
         await _slotRepository.AddSlotsAsync(slots);
+        await InvalidateDoctorSlotCache(doctorId, dto.Start_Time);
 
         return schedule;
     }
@@ -126,6 +127,7 @@ public class ScheduleService : IScheduleService
         ?? throw new KeyNotFoundException("Schedule not found.");
 
         await _scheduleRepository.DeleteAsync(schedule);
+        await InvalidateDoctorSlotCache(schedule.Doctor_Id, schedule.Start_Time);
     }
 
     public async Task UpdateSchedule(Guid scheduleId, ScheduleDTO dto)
@@ -151,8 +153,9 @@ public class ScheduleService : IScheduleService
         schedule.End_Time = dto.End_Time;
 
         await _scheduleRepository.UpdateScheduleAsync(schedule);
+        await InvalidateDoctorSlotCache(schedule.Doctor_Id, dto.Start_Time);
     }
-    
+
     public async Task BlockSlotAsync(Guid doctorId, DateTime appointmentTime)
     {
         var slot = await _slotRepository.GetSlot(doctorId, appointmentTime);
@@ -160,6 +163,14 @@ public class ScheduleService : IScheduleService
         {
             slot.IsAvailable = false;
             await _slotRepository.UpdateSlotAsync(slot);
+            await InvalidateDoctorSlotCache(doctorId, appointmentTime);
         }
+    }
+    
+    private async Task InvalidateDoctorSlotCache(Guid doctorId, DateTime date)
+    {
+        var cacheKey = $"slots_{doctorId}_{date:yyyyMMdd}";
+        await _cache.RemoveAsync(cacheKey);
+        _logger.LogInformation("Removed cache for doctor {DoctorId} on {Date}", doctorId, date);
     }
 }
