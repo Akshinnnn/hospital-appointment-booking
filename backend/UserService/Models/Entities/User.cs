@@ -28,7 +28,7 @@ namespace UserService.Models.Entities
         public string? Specialisation { get; set; }
 
         [Required]
-        public DateTime Created_At { get; set; }
+        public DateTime Created_At { get; set; } = DateTime.UtcNow;
         
         public ICollection<DoctorSchedule>? Availabilities { get; set; }
 
