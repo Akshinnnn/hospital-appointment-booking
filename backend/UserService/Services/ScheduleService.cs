@@ -2,6 +2,8 @@ using AutoMapper;
 using UserService.Models.Entities;
 using UserService.Services.Repositories;
 using UserService.Models.ScheduleDTOs;
+using Microsoft.Extensions.Caching.Distributed;
+using System.Text.Json;
 
 namespace UserService.Services;
 
@@ -10,15 +12,21 @@ public class ScheduleService : IScheduleService
     private readonly IScheduleRepository _scheduleRepository;
     private readonly ISlotRepository _slotRepository;
     private readonly IMapper _mapper;
+    private readonly IDistributedCache _cache;
+    private readonly ILogger<ScheduleService> _logger;
 
     public ScheduleService(
     IScheduleRepository scheduleRepository,
     ISlotRepository slotRepository,
-    IMapper mapper)
+    IMapper mapper,
+    IDistributedCache cache,
+    ILogger<ScheduleService> logger)
     {
         _scheduleRepository = scheduleRepository ?? throw new ArgumentNullException(nameof(scheduleRepository));
         _slotRepository = slotRepository ?? throw new ArgumentNullException(nameof(slotRepository));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async Task<DoctorSchedule> AddSchedule(Guid doctorId, AddScheduleDTO dto)
@@ -79,9 +87,27 @@ public class ScheduleService : IScheduleService
         if (doctorId == Guid.Empty)
             throw new ArgumentException("Doctor ID is required");
 
-        var slots = await _slotRepository.GetSlots(doctorId, date);
+        var cacheKey = $"slots_{doctorId}_{date:yyyyMMdd}";
 
-        return _mapper.Map<List<TimeSlotDTO>>(slots);
+        var cachedData = await _cache.GetStringAsync(cacheKey);
+        if (!string.IsNullOrEmpty(cachedData))
+        {
+            _logger.LogInformation("Cache hit for doctor {DoctorId} on {Date}", doctorId, date);
+            return JsonSerializer.Deserialize<List<TimeSlotDTO>>(cachedData)!;
+        }
+
+        var slots = await _slotRepository.GetSlots(doctorId, date);
+        var slotDtos = _mapper.Map<List<TimeSlotDTO>>(slots);
+
+        var cacheOptions = new DistributedCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10) 
+        };
+
+        await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(slotDtos), cacheOptions);
+        _logger.LogInformation("Cache miss for doctor {DoctorId}. Slots cached for {Date}.", doctorId, date);
+
+        return slotDtos;
     }
 
     public async Task<ScheduleDTO> GetScheduleById(Guid scheduleId)
