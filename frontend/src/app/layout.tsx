@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { NextAuthProvider } from '@/components/shared/Providers';
+import { SessionProviderWrapper } from '@/components/providers/SessionProviderWrapper';
+import { Navbar } from "@/components/layout/Navbar";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -15,9 +16,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <NextAuthProvider>
-          {children}
-        </NextAuthProvider>
+        <SessionProviderWrapper>
+          <Navbar />
+          <main className="container py-6">
+            {children}
+          </main>
+        </SessionProviderWrapper>
       </body>
     </html>
   );
