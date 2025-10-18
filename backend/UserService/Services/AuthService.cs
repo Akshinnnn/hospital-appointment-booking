@@ -36,6 +36,7 @@ public class AuthService : IAuthService
 
         var user = _mapper.Map<User>(dto);
         user.Password = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+        user.Role = UserRole.PATIENT;
 
         await _userRepository.AddAsync(user);
 

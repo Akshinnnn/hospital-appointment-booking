@@ -65,6 +65,8 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<UsersDbContext>();
     db.Database.Migrate();
+
+    DbInitializer.Seed(db);
 }
 
 if (app.Environment.IsDevelopment())
