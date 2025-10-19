@@ -73,7 +73,7 @@ export default function RegisterPage() {
         });
 
         if (result?.ok) {
-            window.location.href = "/appointments";
+            window.location.href = "/";
         } else {
             throw new Error("Failed to log in after registration.");
         }
@@ -85,7 +85,7 @@ export default function RegisterPage() {
     }
 
     return (
-        <div className="flex items-center justify-center min-h-screen py-8">
+        <div className="flex items-center justify-center py-10">
         <Card className="w-full max-w-md">
             <CardHeader>
             <CardTitle className="text-2xl">Create an Account</CardTitle>

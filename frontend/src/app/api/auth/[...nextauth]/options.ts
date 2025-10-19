@@ -28,7 +28,9 @@ export const authOptions: NextAuthOptions = {
 
           if (!response.ok) return null;
 
-          const token = await response.text();
+          const data = await response.json();
+
+          const token = data.token
 
           if (token) {
             const decoded: any = jwtDecode(token);

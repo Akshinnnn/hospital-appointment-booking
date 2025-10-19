@@ -9,8 +9,9 @@ export default async function HomePage() {
 
   if (user) {
     return (
-      <section className="text-center py-20">
-        <h1 className="text-4xl font-bold mb-4">Welcome back, {user.name}!</h1>
+      <section className="flex flex-col justify-center items-center min-h-[calc(100vh-150px)] text-center">
+        <div>
+        <h1 className="text-4xl font-bold mb-4">Welcome, {user.name}!</h1>
         <p className="text-lg text-muted-foreground mb-8">
           What would you like to do today?
         </p>
@@ -22,12 +23,14 @@ export default async function HomePage() {
             <Link href="/appointments">View My Appointments</Link>
           </Button>
         </div>
+        </div>
       </section>
     );
   }
 
   return (
-    <section className="text-center py-20">
+    <section className="flex flex-col justify-center items-center min-h-[calc(100vh-150px)] text-center">
+      <div>
       <h1 className="text-5xl font-extrabold tracking-tight mb-4">
         Your Health, Simplified.
       </h1>
@@ -36,11 +39,12 @@ export default async function HomePage() {
       </p>
       <div className="flex justify-center gap-4">
         <Button asChild size="lg">
-          <Link href="/register">Get Started</Link>
+          <Link href="/book-appointment">Book</Link>
         </Button>
         <Button asChild size="lg" variant="outline">
           <Link href="/login">Login</Link>
         </Button>
+      </div>
       </div>
     </section>
   );

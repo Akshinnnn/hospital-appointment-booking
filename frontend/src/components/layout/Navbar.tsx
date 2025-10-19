@@ -38,8 +38,8 @@ export const Navbar = () => {
     }
     return (
       <>
-        <NavLink href="/find-doctor">Find a Doctor</NavLink>
-        <NavLink href="/book-appointment">Book Appointment</NavLink>
+        <NavLink href="/find-doctor">Doctors</NavLink>
+        <NavLink href="/book-appointment">Appointment</NavLink>
       </>
     );
   };
@@ -61,12 +61,9 @@ export const Navbar = () => {
       );
     }
     return (
-      <div className="flex items-center gap-2">
-        <Button asChild variant="ghost">
-          <Link href="/login">Login</Link>
-        </Button>
+      <div className="flex items-center">
         <Button asChild>
-          <Link href="/register">Register</Link>
+          <Link href="/login">Sign in</Link>
         </Button>
       </div>
     );
@@ -74,7 +71,7 @@ export const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center">
+      <div className="container flex h-14 items-center mx-auto">
         <div className="mr-4 flex items-center">
           <Link href="/" className="mr-6 font-bold text-lg">
             HealthPlus

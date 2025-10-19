@@ -62,12 +62,12 @@ export default function LoginPage() {
         setError("Invalid email or password. Please try again.");
         console.error("Failed to sign in:", result.error);
         } else if (result?.ok) {
-        router.push("/appointments");
+        router.push("/");
         }
     }
 
     return (
-        <div className="flex items-center justify-center min-h-screen">
+        <div className="flex items-center justify-center py-20">
             <Card className="w-full max-w-sm">
                 <CardHeader>
                     <CardTitle className="text-2xl">Login</CardTitle>
