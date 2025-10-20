@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { log } from 'console';
 
 const api = axios.create({
   baseURL: "http://localhost:8080",
@@ -69,5 +70,13 @@ export const createAppointment = (data: { doctorId: string; appointmentTime: str
 export const getMyAppointments = () => api.get('/api/appointment/myappointments')
 
 export const cancelAppointment = (id: string) => api.put(`/api/appointment/${id}`, { status: 'CANCELLED' });
+
+//MOCK
+export const getMyRecords = () => {
+  console.log("Fetching medical records...");
+  
+  //return api.get('/api/records/myrecords');
+  return Promise.resolve({ data: [] });
+}
 
 export default api;

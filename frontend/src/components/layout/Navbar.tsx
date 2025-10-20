@@ -21,9 +21,9 @@ export const Navbar = () => {
     if (userRole === 'PATIENT') {
       return (
         <>
-          <NavLink href="/appointments">My Appointments</NavLink>
-          <NavLink href="/records">My Records</NavLink>
-          <NavLink href="/account">My Account</NavLink>
+          <NavLink href="/appointments">Appointments</NavLink>
+          <NavLink href="/records">Records</NavLink>
+          <NavLink href="/account">Account</NavLink>
         </>
       );
     }
@@ -31,8 +31,8 @@ export const Navbar = () => {
       return (
         <>
           <NavLink href="/appointments">Appointments</NavLink>
-          <NavLink href="/schedule">My Schedule</NavLink>
-          <NavLink href="/account">My Account</NavLink>
+          <NavLink href="/schedule">Schedule</NavLink>
+          <NavLink href="/account">Account</NavLink>
         </>
       );
     }
