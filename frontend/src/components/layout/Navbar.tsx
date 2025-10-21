@@ -97,7 +97,7 @@ export const Navbar = () => {
 
       {/* Mobile Menu Content */}
       {isMobileMenuOpen && (
-        <div className="md:hidden container py-4 border-t">
+        <div className="md:hidden container py-4 border-t pl-6">
           <nav className="flex flex-col gap-4">
             {renderNavLinks()}
           </nav>

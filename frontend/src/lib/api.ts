@@ -79,4 +79,25 @@ export const getMyRecords = () => {
   return Promise.resolve({ data: [] });
 }
 
+export const getAccountDetails = () => api.get('/api/account');
+
+export const updateAccountDetails = (data: {
+  full_Name?: string;
+  email?: string;
+  phone_Number?: string;
+}) => {
+
+  return api.put('api/account', data);
+}
+
+export const registerUser = (data: {
+  full_Name: string;
+  email: string;
+  password?: string;
+  phone_Number?: string;
+}) => {
+
+  return axios.post("http://localhost:8080/api/auth/register", data);
+}
+
 export default api;
