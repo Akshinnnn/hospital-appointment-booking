@@ -3,11 +3,15 @@
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Calendar, FileText, User, Clock, LogOut, Stethoscope } from 'lucide-react';
 import { useState } from 'react';
 
-const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
-  <Link href={href} className="text-muted-foreground transition-colors hover:text-foreground">
+const NavLink = ({ href, children, icon: Icon }: { href: string; children: React.ReactNode; icon?: any }) => (
+  <Link 
+    href={href} 
+    className="flex items-center gap-2 text-sm font-medium text-foreground/80 transition-colors hover:text-foreground hover:bg-accent px-3 py-2 rounded-md"
+  >
+    {Icon && <Icon className="size-4" />}
     {children}
   </Link>
 );
@@ -21,48 +25,62 @@ export const Navbar = () => {
     if (userRole === 'PATIENT') {
       return (
         <>
-          <NavLink href="/appointments">Appointments</NavLink>
-          <NavLink href="/records">Records</NavLink>
-          <NavLink href="/account">Account</NavLink>
+          <NavLink href="/appointments" icon={Calendar}>Appointments</NavLink>
+          <NavLink href="/records" icon={FileText}>Records</NavLink>
+          <NavLink href="/account" icon={User}>Account</NavLink>
         </>
       );
     }
     if (userRole === 'DOCTOR') {
       return (
         <>
-          <NavLink href="/appointments">Appointments</NavLink>
-          <NavLink href="/schedule">Schedule</NavLink>
-          <NavLink href="/account">Account</NavLink>
+          <NavLink href="/appointments" icon={Calendar}>Appointments</NavLink>
+          <NavLink href="/schedule" icon={Clock}>Schedule</NavLink>
+          <NavLink href="/account" icon={User}>Account</NavLink>
         </>
       );
     }
     return (
       <>
-        <NavLink href="/find-doctor">Doctors</NavLink>
-        <NavLink href="/book-appointment">Appointment</NavLink>
+        <NavLink href="/find-doctor" icon={Stethoscope}>Find Doctor</NavLink>
+        <NavLink href="/book-appointment" icon={Calendar}>Book Appointment</NavLink>
       </>
     );
   };
 
   const UserProfile = () => {
     if (status === 'loading') {
-      return <div className="h-10 w-24 animate-pulse rounded-md bg-muted" />; // Skeleton loader
+      return (
+        <div className="flex items-center gap-3">
+          <div className="h-8 w-20 animate-pulse rounded-md bg-muted" />
+          <div className="h-8 w-16 animate-pulse rounded-md bg-muted" />
+        </div>
+      );
     }
+    
     if (session) {
       return (
-        <div className="flex items-center gap-4">
-          <span className="hidden sm:inline text-sm font-medium">
-            Welcome, {session.user?.name}
-          </span>
-          <Button variant="outline" onClick={() => signOut({ callbackUrl: '/' })}>
-            Logout
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-md bg-muted">
+            <User className="size-4 text-muted-foreground" />
+            <span className="text-sm font-medium">{session.user?.name}</span>
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => signOut({ callbackUrl: '/' })}
+            className="gap-2"
+          >
+            <LogOut className="size-4" />
+            <span className="hidden sm:inline">Logout</span>
           </Button>
         </div>
       );
     }
+    
     return (
       <div className="flex items-center">
-        <Button asChild>
+        <Button asChild size="sm">
           <Link href="/login">Sign in</Link>
         </Button>
       </div>
@@ -71,38 +89,58 @@ export const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center mx-auto">
-        <div className="mr-4 flex items-center">
-          <Link href="/" className="mr-6 font-bold text-lg">
-            HealthPlus
-          </Link>
-          {/* Desktop Navigation */}
-          <nav className="hidden items-center gap-6 text-sm md:flex">
-            {renderNavLinks()}
-          </nav>
+      <div className="container flex h-16 items-center justify-between mx-auto px-4">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2 mr-6">
+          <div className="flex items-center justify-center size-8 rounded-lg bg-primary text-primary-foreground">
+            <Stethoscope className="size-5" />
+          </div>
+          <span className="font-bold text-lg hidden sm:inline">HealthPlus</span>
+          <span className="font-bold text-lg sm:hidden">HP</span>
+        </Link>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-1 flex-1">
+          {renderNavLinks()}
+        </nav>
+
+        {/* Desktop User Profile */}
+        <div className="hidden md:flex items-center">
+          <UserProfile />
         </div>
 
         {/* Mobile Menu Button */}
-        <div className="flex flex-1 items-center justify-end md:hidden">
-          <button onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}>
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
-
-        {/* Right side of Navbar for Desktop */}
-        <div className="hidden flex-1 items-center justify-end md:flex">
-          <UserProfile />
+        <div className="flex md:hidden">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            {isMobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+          </Button>
         </div>
       </div>
 
-      {/* Mobile Menu Content */}
+      {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden container py-4 border-t pl-6">
-          <nav className="flex flex-col gap-4">
-            {renderNavLinks()}
-          </nav>
-          <div className="mt-4 pt-4 border-t">
-             <UserProfile />
+        <div className="md:hidden border-t bg-background">
+          <div className="container px-4 py-4 space-y-3">
+            {/* Mobile Navigation Links */}
+            <nav className="flex flex-col gap-1">
+              {renderNavLinks()}
+            </nav>
+            
+            {/* Mobile User Profile */}
+            <div className="pt-3 border-t">
+              {session && (
+                <div className="flex items-center gap-2 px-3 py-2 mb-2 rounded-md bg-muted">
+                  <User className="size-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">{session.user?.name}</span>
+                </div>
+              )}
+              <UserProfile />
+            </div>
           </div>
         </div>
       )}
