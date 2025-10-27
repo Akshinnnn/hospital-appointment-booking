@@ -19,7 +19,13 @@ export default withAuth(
     },
     {
         callbacks: {
-            authorized: ({ token }) => !!token,
+            authorized: ({ token, req }) => {
+                if (req.nextUrl.pathname === "/book-appointment") {
+                    return true;
+                }
+
+                return !!token;
+            }
         }
     }
 )
