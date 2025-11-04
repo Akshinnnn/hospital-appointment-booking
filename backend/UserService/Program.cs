@@ -54,7 +54,7 @@ builder.Services.AddHostedService<RabbitMqConsumer>();
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = builder.Configuration.GetConnectionString("Redis");
-    options.InstanceName = "UserService_";
+    options.InstanceName = "userservice_";
 });
 
 builder.Services.AddAuthorization();

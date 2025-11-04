@@ -34,7 +34,7 @@ namespace UserService.Services
 
         public async Task<List<User>> GetDoctorsBySpecialisationAsync(string specialisation)
         {
-            var cacheKey = $"{specialisation.ToLower()}";
+            var cacheKey = $"doctor_{specialisation.ToLower()}";
 
             var cachedData = await _cache.GetStringAsync(cacheKey);
             if (!string.IsNullOrEmpty(cachedData))
