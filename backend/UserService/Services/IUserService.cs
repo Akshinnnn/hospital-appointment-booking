@@ -8,7 +8,8 @@ namespace UserService.Services
         Task<string> RegisterAsync(RegisterDTO dto);
         Task<string> LoginAsync(LoginDTO dto);
         Task<UserDTO> GetUserProfileAsync(Guid userId);
-        Task UpdateUserAsync(Guid guid, UpdateDTO dto);
+        Task UpdateAccountAsync(Guid guid, UpdateDTO dto);
+        Task UpdateUserAsync(Guid guid, User user);
         Task<List<UserDTO>> GetAllUsersAsync();
         Task<User> GetByIdAsync(Guid userId);
     }

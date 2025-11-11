@@ -60,12 +60,25 @@ public class UserService : IUserService
         return _mapper.Map<UserDTO>(user);
     }
 
-    public async Task UpdateUserAsync(Guid guid, UpdateDTO dto)
+    public async Task UpdateAccountAsync(Guid guid, UpdateDTO dto)
     {
         var user = await _userRepository.GetByIdAsync(guid)
             ?? throw new KeyNotFoundException("User not found");
 
         var entity = _mapper.Map(dto, user);
+        await _userRepository.UpdateAsync(entity);
+    }
+
+    public async Task UpdateUserAsync(Guid guid, User user)
+    {
+        var entity = await _userRepository.GetByIdAsync(guid)
+            ?? throw new KeyNotFoundException("User not found");
+
+        entity.Full_Name = user.Full_Name;
+        entity.Email = user.Email;
+        entity.Role = user.Role;
+        entity.Password = user.Password;
+        entity.Phone_Number = user.Phone_Number;
         await _userRepository.UpdateAsync(entity);
     }
 

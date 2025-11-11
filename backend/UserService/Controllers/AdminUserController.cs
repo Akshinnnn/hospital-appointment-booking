@@ -27,5 +27,12 @@ namespace UserService.Controllers
             var users = await _userService.GetAllUsersAsync();
             return Ok(users);
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser([FromRoute] Guid id, [FromBody] User user)
+        {
+            await _userService.UpdateUserAsync(id, user);
+            return Ok();
+        }
     }
 }

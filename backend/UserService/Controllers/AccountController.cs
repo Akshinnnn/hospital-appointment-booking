@@ -38,7 +38,7 @@ public class AccountController : ControllerBase
         if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var guid))
             return Unauthorized("Invalid token");
 
-        await _userService.UpdateUserAsync(guid, dto);
+        await _userService.UpdateAccountAsync(guid, dto);
         return Ok();
     }
 }
