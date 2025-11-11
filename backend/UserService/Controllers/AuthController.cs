@@ -8,26 +8,24 @@ namespace UserService.Controllers;
 [Route("api/auth")]
 public class AuthController : ControllerBase
 {
-    private readonly IUserService _authService;
+    private readonly IUserService _userService;
 
-    public AuthController(IUserService authService)
+    public AuthController(IUserService userService)
     {
-        _authService = authService ?? throw new ArgumentNullException(nameof(authService));
+        _userService = userService;
     }
 
-    // POST: api/auth/register
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDTO dto)
     {
-        var token = await _authService.RegisterAsync(dto);
-        return Ok(new { Token = token });
+        var result = await _userService.RegisterAsync(dto);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
-    // POST: api/auth/login
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDTO dto)
     {
-        var token = await _authService.LoginAsync(dto);
-        return Ok(new { Token = token });
+        var result = await _userService.LoginAsync(dto);
+        return result.Success ? Ok(result) : Unauthorized(result);
     }
 }

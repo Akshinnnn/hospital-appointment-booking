@@ -8,7 +8,9 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using UserService.Messaging;
-using Microsoft.Extensions.Caching.StackExchangeRedis;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using UserService.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
@@ -57,6 +59,9 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.InstanceName = "userservice_";
 });
 
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterValidator>();
+builder.Services.AddFluentValidationAutoValidation();
+
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
@@ -74,6 +79,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.UseHttpsRedirection();
 }
+app.UseMiddleware<ExceptionMiddleware>();
 app.MapGet("/", () => "UserService is running.");
 app.MapControllers();
 app.Run();

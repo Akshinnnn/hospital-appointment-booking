@@ -1,44 +1,41 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UserService.Models.DTOs;
+using UserService.Models.Responses;
 using UserService.Services;
 
 namespace UserService.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/account")]
 public class AccountController : ControllerBase
 {
     private readonly IUserService _userService;
 
-    public AccountController(IUserService userService)
-    {
-        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-    }
+    public AccountController(IUserService userService) => _userService = userService;
 
-    // GET: api/account
-    [Authorize]
     [HttpGet]
     public async Task<IActionResult> GetProfile()
     {
-        var userId = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var guid))
-            return Unauthorized("Invalid token");
+        var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!Guid.TryParse(idClaim, out var userId))
+            return Unauthorized(ApiResponse<string>.Fail("Invalid token"));
 
-        var userProfile = await _userService.GetUserProfileAsync(guid);
-        return Ok(userProfile);
+        var result = await _userService.GetUserProfileAsync(userId);
+        return result.Success ? Ok(result) : NotFound(result);
     }
 
-    // UPDATE: api/account
-    [Authorize]
     [HttpPut]
     public async Task<IActionResult> UpdateAccount([FromBody] UpdateDTO dto)
     {
-        var userId = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var guid))
-            return Unauthorized("Invalid token");
+        var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!Guid.TryParse(idClaim, out var userId))
+            return Unauthorized(ApiResponse<string>.Fail("Invalid token"));
 
-        await _userService.UpdateAccountAsync(guid, dto);
-        return Ok();
+        var result = await _userService.UpdateAccountAsync(userId, dto);
+        return result.Success ? Ok(result) : NotFound(result);
     }
 }
+

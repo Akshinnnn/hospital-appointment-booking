@@ -1,10 +1,12 @@
 using AutoMapper;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.IdentityModel.Tokens;
 using UserService.Models.DTOs;
 using UserService.Models.Entities;
+using UserService.Models.Responses;
 using UserService.Services.Repositories;
 
 namespace UserService.Services;
@@ -13,73 +15,75 @@ public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
-    private readonly IConfiguration _configuration;
+    private readonly IConfiguration _config;
 
-    public UserService(
-        IUserRepository userRepository,
-        IMapper mapper,
-        IConfiguration configuration)
+    public UserService(IUserRepository userRepository, IMapper mapper, IConfiguration config)
     {
-        _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
-        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+        _userRepository = userRepository;
+        _mapper = mapper;
+        _config = config;
     }
 
-    public async Task<string> RegisterAsync(RegisterDTO dto)
+    public async Task<ApiResponse<string>> RegisterAsync(RegisterDTO dto)
     {
-        if (dto == null || string.IsNullOrWhiteSpace(dto.Full_Name) || string.IsNullOrWhiteSpace(dto.Password))
-            throw new ArgumentException("Invalid user data");
-
         var exists = await _userRepository.ExistsAsync(dto.Full_Name, dto.Email);
         if (exists)
-            throw new InvalidOperationException("Username or email already exists");
+            return ApiResponse<string>.Fail("Username or email already exists");
 
         var user = _mapper.Map<User>(dto);
         user.Password = BCrypt.Net.BCrypt.HashPassword(dto.Password);
         user.Role = UserRole.PATIENT;
-
         await _userRepository.AddAsync(user);
 
-        return GenerateJwtToken(user);
+        var token = GenerateJwtToken(user);
+        return ApiResponse<string>.Ok(token, "Registration successful");
     }
 
-    public async Task<string> LoginAsync(LoginDTO dto)
+    public async Task<ApiResponse<string>> LoginAsync(LoginDTO dto)
     {
         var user = await _userRepository.GetByEmailAsync(dto.Email);
         if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.Password))
-            throw new UnauthorizedAccessException("Invalid credentials");
+            return ApiResponse<string>.Fail("Invalid credentials");
 
-        return GenerateJwtToken(user);
+        var token = GenerateJwtToken(user);
+        return ApiResponse<string>.Ok(token, "Login successful");
     }
 
-    public async Task<UserDTO> GetUserProfileAsync(Guid userId)
+    public async Task<ApiResponse<UserDTO>> GetUserProfileAsync(Guid userId)
     {
-        var user = await _userRepository.GetByIdAsync(userId)
-            ?? throw new KeyNotFoundException("User not found");
+        var user = await _userRepository.GetByIdAsync(userId);
+        if (user == null)
+            return ApiResponse<UserDTO>.Fail("User not found");
 
-        return _mapper.Map<UserDTO>(user);
+        return ApiResponse<UserDTO>.Ok(_mapper.Map<UserDTO>(user));
     }
 
-    public async Task UpdateAccountAsync(Guid guid, UpdateDTO dto)
+    public async Task<ApiResponse<bool>> UpdateAccountAsync(Guid userId, UpdateDTO dto)
     {
-        var user = await _userRepository.GetByIdAsync(guid)
-            ?? throw new KeyNotFoundException("User not found");
+        var user = await _userRepository.GetByIdAsync(userId);
+        if (user == null)
+            return ApiResponse<bool>.Fail("User not found");
 
-        var entity = _mapper.Map(dto, user);
+        _mapper.Map(dto, user);
+        await _userRepository.UpdateAsync(user);
+        return ApiResponse<bool>.Ok(true, "Account updated successfully");
+    }
+
+    public async Task<ApiResponse<bool>> UpdateUserAsync(Guid id, User user)
+    {
+        var entity = await _userRepository.GetByIdAsync(id);
+        if (entity == null)
+            return ApiResponse<bool>.Fail("User not found");
+
+        _mapper.Map(user, entity);
         await _userRepository.UpdateAsync(entity);
+        return ApiResponse<bool>.Ok(true, "User updated successfully");
     }
 
-    public async Task UpdateUserAsync(Guid guid, User user)
+    public async Task<ApiResponse<List<UserDTO>>> GetAllUsersAsync()
     {
-        var entity = await _userRepository.GetByIdAsync(guid)
-            ?? throw new KeyNotFoundException("User not found");
-
-        entity.Full_Name = user.Full_Name;
-        entity.Email = user.Email;
-        entity.Role = user.Role;
-        entity.Password = user.Password;
-        entity.Phone_Number = user.Phone_Number;
-        await _userRepository.UpdateAsync(entity);
+        var users = await _userRepository.GetAllAsync();
+        return ApiResponse<List<UserDTO>>.Ok(_mapper.Map<List<UserDTO>>(users));
     }
 
     private string GenerateJwtToken(User user)
@@ -91,27 +95,16 @@ public class UserService : IUserService
             new Claim(ClaimTypes.Role, user.Role.ToString())
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Secret"]));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JwtSettings:Secret"]));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            issuer: _configuration["JwtSettings:Issuer"],
-            audience: _configuration["JwtSettings:Audience"],
+            issuer: _config["JwtSettings:Issuer"],
+            audience: _config["JwtSettings:Audience"],
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(int.Parse(_configuration["JwtSettings:ExpiryMinutes"])),
+            expires: DateTime.UtcNow.AddMinutes(int.Parse(_config["JwtSettings:ExpiryMinutes"])),
             signingCredentials: creds);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
-    }
-
-    public Task<List<UserDTO>> GetAllUsersAsync()
-    {
-        var users = _userRepository.GetAllAsync();
-        return users.ContinueWith(t => _mapper.Map<List<UserDTO>>(t.Result));
-    }
-
-    public Task<User> GetByIdAsync(Guid userId)
-    {
-        return _userRepository.GetByIdAsync(userId);    
     }
 }
