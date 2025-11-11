@@ -19,6 +19,7 @@ namespace AppointmentService.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> GetAll()
         {
             var result = await _service.GetAllAsync();
