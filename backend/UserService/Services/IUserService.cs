@@ -1,4 +1,5 @@
 using UserService.Models.DTOs;
+using UserService.Models.Entities;
 
 namespace UserService.Services
 {
@@ -8,5 +9,7 @@ namespace UserService.Services
         Task<string> LoginAsync(LoginDTO dto);
         Task<UserDTO> GetUserProfileAsync(Guid userId);
         Task UpdateUserAsync(Guid guid, UpdateDTO dto);
+        Task<List<UserDTO>> GetAllUsersAsync();
+        Task<User> GetByIdAsync(Guid userId);
     }
 }

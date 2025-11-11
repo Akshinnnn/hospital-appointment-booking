@@ -90,4 +90,15 @@ public class UserService : IUserService
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+    public Task<List<UserDTO>> GetAllUsersAsync()
+    {
+        var users = _userRepository.GetAllAsync();
+        return users.ContinueWith(t => _mapper.Map<List<UserDTO>>(t.Result));
+    }
+
+    public Task<User> GetByIdAsync(Guid userId)
+    {
+        return _userRepository.GetByIdAsync(userId);    
+    }
 }
