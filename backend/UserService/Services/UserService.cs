@@ -9,14 +9,14 @@ using UserService.Services.Repositories;
 
 namespace UserService.Services;
 
-public class AuthService : IAuthService
+public class UserService : IUserService
 {
-    private readonly IAuthRepository _userRepository;
+    private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
     private readonly IConfiguration _configuration;
 
-    public AuthService(
-        IAuthRepository userRepository,
+    public UserService(
+        IUserRepository userRepository,
         IMapper mapper,
         IConfiguration configuration)
     {

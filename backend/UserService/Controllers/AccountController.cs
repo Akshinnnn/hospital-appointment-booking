@@ -9,11 +9,11 @@ namespace UserService.Controllers;
 [Route("api/account")]
 public class AccountController : ControllerBase
 {
-    private readonly IAuthService _authService;
+    private readonly IUserService _userService;
 
-    public AccountController(IAuthService authService)
+    public AccountController(IUserService userService)
     {
-        _authService = authService ?? throw new ArgumentNullException(nameof(authService));
+        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
     }
 
     // GET: api/account
@@ -25,7 +25,7 @@ public class AccountController : ControllerBase
         if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var guid))
             return Unauthorized("Invalid token");
 
-        var userProfile = await _authService.GetUserProfileAsync(guid);
+        var userProfile = await _userService.GetUserProfileAsync(guid);
         return Ok(userProfile);
     }
 
@@ -38,7 +38,7 @@ public class AccountController : ControllerBase
         if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var guid))
             return Unauthorized("Invalid token");
 
-        await _authService.UpdateUserAsync(guid, dto);
+        await _userService.UpdateUserAsync(guid, dto);
         return Ok();
     }
 }

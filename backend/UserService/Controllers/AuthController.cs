@@ -8,9 +8,9 @@ namespace UserService.Controllers;
 [Route("api/auth")]
 public class AuthController : ControllerBase
 {
-    private readonly IAuthService _authService;
+    private readonly IUserService _authService;
 
-    public AuthController(IAuthService authService)
+    public AuthController(IUserService authService)
     {
         _authService = authService ?? throw new ArgumentNullException(nameof(authService));
     }
