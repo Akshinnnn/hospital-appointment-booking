@@ -1,10 +1,12 @@
 using AutoMapper;
 using Google.Cloud.Storage.V1;
+using Google.Cloud.Storage.V1.SignedUrls;
 using MedicalRecordService.Models;
 using MedicalRecordService.Models.DTOs;
 using MedicalRecordService.Services.Repositories;
 using MedicalRecordsService.GoogleCloudConfiguration;
 using MedicalRecordsService.Models.DTOs;
+using MedicalRecordsService.Models.Responses;
 using Microsoft.Extensions.Options;
 
 namespace MedicalRecordsService.Services
@@ -28,10 +30,10 @@ namespace MedicalRecordsService.Services
             _mapper = mapper;
         }
 
-        public async Task<Record> AddRecord(Guid id, AddRecordDTO dto)
+        public async Task<ApiResponse<Record>> AddRecord(Guid id, AddRecordDTO dto)
         {
             if (dto.File == null || dto.File.Length == 0)
-                throw new ArgumentException("File is required");
+                return ApiResponse<Record>.Fail("File is required");
 
             var fileName = $"{Guid.NewGuid()}_{dto.File.FileName}";
             using var stream = dto.File.OpenReadStream();
@@ -56,18 +58,19 @@ namespace MedicalRecordsService.Services
                 };
 
                 await _repository.AddAsync(record);
-                return record;
+                return ApiResponse<Record>.Ok(record, "Record uploaded successfully");
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException("Failed to upload file to Google Cloud Storage", ex);
+                return ApiResponse<Record>.Fail($"Failed to upload file to Google Cloud Storage: {ex.Message}");
             }
         }
 
-        public async Task<Record?> GetById(Guid id)
+        public async Task<ApiResponse<Record>> GetById(Guid id)
         {
             var record = await _repository.GetByIdAsync(id);
-            if (record == null) return null;
+            if (record == null)
+                return ApiResponse<Record>.Fail("Record not found");
 
             var objectName = Path.GetFileName(record.FilePath);
 
@@ -79,13 +82,14 @@ namespace MedicalRecordsService.Services
                 HttpMethod.Get);
 
             record.FilePath = signedUrl; 
-            return record;
+            return ApiResponse<Record>.Ok(record, "Record retrieved successfully");
         }
 
-        public async Task<Record> Update(Guid id, UpdateRecordDTO dto)
+        public async Task<ApiResponse<Record>> Update(Guid id, UpdateRecordDTO dto)
         {
-            var record = await _repository.GetByIdAsync(id)
-                ?? throw new KeyNotFoundException("Record not found");
+            var record = await _repository.GetByIdAsync(id);
+            if (record == null)
+                return ApiResponse<Record>.Fail("Record not found");
 
             record.Title = dto.Title ?? record.Title;
             record.Description = dto.Description ?? record.Description;
@@ -93,18 +97,19 @@ namespace MedicalRecordsService.Services
             try
             {
                 await _repository.UpdateAsync(record);
-                return record;
+                return ApiResponse<Record>.Ok(record, "Record updated successfully");
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException("Failed to update record", ex);
+                return ApiResponse<Record>.Fail($"Failed to update record: {ex.Message}");
             }
         }
 
-        public async Task Delete(Guid id)
+        public async Task<ApiResponse<string>> Delete(Guid id)
         {
-            var record = await _repository.GetByIdAsync(id)
-                ?? throw new KeyNotFoundException("Record not found");
+            var record = await _repository.GetByIdAsync(id);
+            if (record == null)
+                return ApiResponse<string>.Fail("Record not found");
 
             try
             {
@@ -115,28 +120,31 @@ namespace MedicalRecordsService.Services
                 }
 
                 await _repository.DeleteAsync(record);
+                return ApiResponse<string>.Ok("Record deleted successfully", "Record deleted successfully");
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException("Failed to delete record", ex);
+                return ApiResponse<string>.Fail($"Failed to delete record: {ex.Message}");
             }
         }
 
-        public async Task<List<Record>> GetMyRecords(Guid userId, string role)
+        public async Task<ApiResponse<List<Record>>> GetMyRecords(Guid userId, string role)
         {
+            List<Record> records;
             if (role == "DOCTOR")
             {
-                List<Record> records = await _repository.GetByExpression(r => r.Doctor_Id == userId);
-                return records;
+                records = await _repository.GetByExpression(r => r.Doctor_Id == userId);
             }
-
-            if (role == "PATIENT")
+            else if (role == "PATIENT")
             {
-                List<Record> records = await _repository.GetByExpression(r => r.Patient_Id == userId);
-                return records;
+                records = await _repository.GetByExpression(r => r.Patient_Id == userId);
+            }
+            else
+            {
+                return ApiResponse<List<Record>>.Fail("Invalid role");
             }
 
-            return new List<Record>();
+            return ApiResponse<List<Record>>.Ok(records, "Records retrieved successfully");
         }
     }
 }
