@@ -5,22 +5,23 @@ using UserService.Models.Entities;
 
 namespace UserService.Services.Repositories;
 
-public interface IAuthRepository
+public interface IUserRepository
 {
     Task<User> GetByUsernameAsync(string name);
     Task<User> GetByEmailAsync(string email);
     Task<User> GetByIdAsync(Guid id);
+    Task<List<User>> GetAllAsync(Expression<Func<User, bool>>? filter = null);
     Task<bool> ExistsAsync(string name, string email);
     Task AddAsync(User user);
     Task UpdateAsync(User user);
     Task DeleteAsync(User user);
 }
 
-public class AuthRepository : IAuthRepository
+public class UserRepository : IUserRepository
 {
     private readonly UsersDbContext _dbContext;
 
-    public AuthRepository(UsersDbContext dbContext)
+    public UserRepository(UsersDbContext dbContext)
     {
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
@@ -64,5 +65,17 @@ public class AuthRepository : IAuthRepository
     {
         return await _dbContext.Users.
                         FirstOrDefaultAsync(u => u.Email == email);
+    }
+
+    public async Task<List<User>> GetAllAsync(Expression<Func<User, bool>>? filter = null)
+    {
+        IQueryable<User> query = _dbContext.Users;
+
+        if (filter != null)
+        {
+            query = query.Where(filter);
+        }
+
+        return await query.ToListAsync();
     }
 }

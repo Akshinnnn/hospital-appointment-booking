@@ -6,7 +6,7 @@ using UserService.Services;
 namespace UserService.Controllers;
 [ApiController]
 [Route("api")]
-[Authorize(Roles = "DOCTOR")]
+[Authorize(Roles = "DOCTOR, ADMIN")]
 public class ScheduleController : ControllerBase
 {
     private readonly IScheduleService _scheduleService;

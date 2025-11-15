@@ -29,6 +29,10 @@ namespace AppointmentService.Models.Entities
         [Required]
         public AppointmentStatus Status { get; set; } = AppointmentStatus.APPROVED;
 
+        [Required]
+        [MaxLength(50)]
+        public string AppointmentNumber { get; set; } = string.Empty;
+
         public string? Notes { get; set; }
         
     }

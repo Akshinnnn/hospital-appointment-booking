@@ -9,6 +9,9 @@ using MedicalRecordsService.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using MedicalRecordsService.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
@@ -30,7 +33,12 @@ builder.Services.AddDbContext<RecordDbContext>(option =>
 
 builder.Services.AddScoped<IRecordService, RecordService>();
 builder.Services.AddScoped<IRecordRepository, RecordRepository>();
+builder.Services.AddSingleton<MedicalRecordsService.Messaging.IRabbitMqProducer, MedicalRecordsService.Messaging.RabbitMqProducer>();
+builder.Services.AddHttpClient();
 builder.Services.AddAutoMapper(typeof(Program));
+
+builder.Services.AddValidatorsFromAssemblyContaining<AddRecordValidator>();
+builder.Services.AddFluentValidationAutoValidation();
 
 builder.Services.AddAuthorization();
 
@@ -70,11 +78,12 @@ if (app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 
+app.UseMiddleware<ExceptionMiddleware>();
 app.MapGet("/", () => "MedicalRecordService is running.");
-
-app.MapControllers();
 
 app.UseAuthentication();  
 app.UseAuthorization(); 
+
+app.MapControllers();
 
 app.Run();

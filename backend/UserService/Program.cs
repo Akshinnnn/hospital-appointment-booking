@@ -8,6 +8,9 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using UserService.Messaging;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using UserService.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
@@ -17,9 +20,12 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
     });
 
+// postgres configuration
 builder.Services.AddDbContext<UsersDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+// jwt configuration
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
     {
@@ -35,9 +41,10 @@ builder.Services.AddAuthentication("Bearer")
                 Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Secret"]))
         };
     });
-builder.Services.AddAuthorization();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+
+// dependency injection
+builder.Services.AddScoped<IUserService, UserService.Services.UserService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IScheduleService, ScheduleService>();
 builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
 builder.Services.AddScoped<ISlotRepository, SlotRepository>();
@@ -45,12 +52,26 @@ builder.Services.AddScoped<IDoctorService, DoctorService>();
 builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
 builder.Services.AddHostedService<RabbitMqConsumer>();
 
+// redis configuration
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+    options.InstanceName = "userservice_";
+});
+
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterValidator>();
+builder.Services.AddFluentValidationAutoValidation();
+
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<UsersDbContext>();
     db.Database.Migrate();
+
+    DbInitializer.Seed(db);
 }
 
 if (app.Environment.IsDevelopment())
@@ -58,6 +79,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.UseHttpsRedirection();
 }
+app.UseMiddleware<ExceptionMiddleware>();
 app.MapGet("/", () => "UserService is running.");
 app.MapControllers();
 app.Run();

@@ -23,7 +23,7 @@ namespace UserService.Models.Entities
         public string Password { get; set; }
 
         [Required]
-        public UserRole Role { get; set; } = UserRole.PATIENT;
+        public UserRole Role { get; set; }
 
         public string? Specialisation { get; set; }
 

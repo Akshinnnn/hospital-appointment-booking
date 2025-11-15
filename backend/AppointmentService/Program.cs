@@ -5,6 +5,9 @@ using AppointmentService.Services;
 using AppointmentService.Services.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using AppointmentService.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +52,9 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
     });
 
+builder.Services.AddValidatorsFromAssemblyContaining<AppointmentCreateValidator>();
+builder.Services.AddFluentValidationAutoValidation();
+
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -66,11 +72,12 @@ if (app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 
+app.UseMiddleware<ExceptionMiddleware>();
 app.MapGet("/", () => "AppointmentService is running.");
-
-app.MapControllers();
 
 app.UseAuthentication();  
 app.UseAuthorization(); 
+
+app.MapControllers();
 
 app.Run();

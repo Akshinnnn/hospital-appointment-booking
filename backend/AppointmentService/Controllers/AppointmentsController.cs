@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using AppointmentService.Services;
 using AppointmentService.Models.DTOs.AppointmentDTOs;
+using AppointmentService.Models.Responses;
 using Microsoft.AspNetCore.Authorization;
 using AppointmentService.Messaging;
 
@@ -19,9 +20,12 @@ namespace AppointmentService.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> GetAll()
         {
             var result = await _service.GetAllAsync();
+            if (!result.Success)
+                return BadRequest(result);
             return Ok(result);
         }
 
@@ -30,20 +34,24 @@ namespace AppointmentService.Controllers
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var guid))
-                return Unauthorized("Invalid token");
+                return Unauthorized(ApiResponse<string>.Fail("Invalid token"));
 
             var role = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value;
             if (string.IsNullOrWhiteSpace(role))
-                return Unauthorized("Invalid token");
+                return Unauthorized(ApiResponse<string>.Fail("Invalid token"));
 
-            var appointments = await _service.GetMyAppointments(guid, role);
-            return Ok(appointments);
+            var result = await _service.GetMyAppointments(guid, role);
+            if (!result.Success)
+                return BadRequest(result);
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var result = await _service.GetByIdAsync(id);
+            if (!result.Success)
+                return NotFound(result);
             return Ok(result);
         }
 
@@ -55,24 +63,28 @@ namespace AppointmentService.Controllers
             if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var guid))
                 guid = Guid.Empty; 
 
-            var entity = await _service.CreateAsync(dto, guid);
-            
-            return Ok(entity);
+            var result = await _service.CreateAsync(dto, guid);
+            if (!result.Success)
+                return BadRequest(result);
+            return Ok(result);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            await _service.DeleteAsync(id);
-            return Ok("Appointment deleted");
+            var result = await _service.DeleteAsync(id);
+            if (!result.Success)
+                return NotFound(result);
+            return Ok(result);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Cancel(Guid id)
         {
-            await _service.CancelAppointment(id);
-
-            return Ok("Appointment cancelled");
+            var result = await _service.CancelAppointment(id);
+            if (!result.Success)
+                return NotFound(result);
+            return Ok(result);
         }
     }
 }
