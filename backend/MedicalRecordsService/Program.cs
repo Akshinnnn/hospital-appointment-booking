@@ -33,6 +33,8 @@ builder.Services.AddDbContext<RecordDbContext>(option =>
 
 builder.Services.AddScoped<IRecordService, RecordService>();
 builder.Services.AddScoped<IRecordRepository, RecordRepository>();
+builder.Services.AddSingleton<MedicalRecordsService.Messaging.IRabbitMqProducer, MedicalRecordsService.Messaging.RabbitMqProducer>();
+builder.Services.AddHttpClient();
 builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddValidatorsFromAssemblyContaining<AddRecordValidator>();

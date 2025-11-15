@@ -11,6 +11,8 @@ services:
         condition: service_started
       medicalrecordservice:
         condition: service_started
+      notificationservice:
+        condition: service_started
     networks:
       default: {}
 
@@ -24,6 +26,7 @@ services:
       - 8081:8080
     depends_on:
       - postgres
+      - rabbitmq
     networks:
       default: {}
 
@@ -37,6 +40,7 @@ services:
       - 8082:8080
     depends_on:
       - postgres
+      - rabbitmq
     networks:
       default: {}
 
@@ -50,6 +54,21 @@ services:
       - 8083:8080
     depends_on:
       - postgres
+      - rabbitmq
+      - userservice
+    networks:
+      default: {}
+
+  notificationservice:
+    image: ${PROJECT_NAME}_notification
+    container_name: ${PROJECT_NAME}_notification
+    build:
+      context: ./backend/NotificationService
+    restart: unless-stopped
+    ports:
+      - 8084:8080
+    depends_on:
+      - rabbitmq
     networks:
       default: {}
 

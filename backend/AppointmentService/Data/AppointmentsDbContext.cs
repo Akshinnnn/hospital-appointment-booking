@@ -39,5 +39,9 @@ public class AppointmentsDbContext : DbContext
         .HasIndex(a => new { a.DoctorId, a.AppointmentTime })
         .IsUnique();
 
+        modelBuilder.Entity<Appointment>()
+        .HasIndex(a => a.AppointmentNumber)
+        .IsUnique();
+
     }
 }

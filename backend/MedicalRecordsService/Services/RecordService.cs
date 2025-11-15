@@ -5,9 +5,11 @@ using MedicalRecordService.Models;
 using MedicalRecordService.Models.DTOs;
 using MedicalRecordService.Services.Repositories;
 using MedicalRecordsService.GoogleCloudConfiguration;
+using MedicalRecordsService.Messaging;
 using MedicalRecordsService.Models.DTOs;
 using MedicalRecordsService.Models.Responses;
 using Microsoft.Extensions.Options;
+using System.Text.Json;
 
 namespace MedicalRecordsService.Services
 {
@@ -17,17 +19,29 @@ namespace MedicalRecordsService.Services
         private readonly IRecordRepository _repository;
         private readonly StorageClient _storageClient;
         private readonly GoogleCloudConfig _options;
+        private readonly IRabbitMqProducer _producer;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfiguration _configuration;
+        private readonly ILogger<RecordService> _logger;
 
         public RecordService(
             IMapper mapper,
             IRecordRepository repository,
             StorageClient storageClient,
-            IOptions<GoogleCloudConfig> options)
+            IOptions<GoogleCloudConfig> options,
+            IRabbitMqProducer producer,
+            IHttpClientFactory httpClientFactory,
+            IConfiguration configuration,
+            ILogger<RecordService> logger)
         {
             _repository = repository;
             _storageClient = storageClient;
             _options = options.Value;
             _mapper = mapper;
+            _producer = producer;
+            _httpClientFactory = httpClientFactory;
+            _configuration = configuration;
+            _logger = logger;
         }
 
         public async Task<ApiResponse<Record>> AddRecord(Guid id, AddRecordDTO dto)
@@ -58,6 +72,31 @@ namespace MedicalRecordsService.Services
                 };
 
                 await _repository.AddAsync(record);
+
+                // Publish message to RabbitMQ for notification
+                try
+                {
+                    var patientEmail = await GetPatientEmailAsync(dto.Patient_Id);
+                    var message = new
+                    {
+                        Id = record.Id,
+                        Patient_Id = record.Patient_Id,
+                        PatientEmail = patientEmail ?? string.Empty,
+                        Doctor_Id = record.Doctor_Id,
+                        Title = record.Title,
+                        Description = record.Description,
+                        CreatedAt = record.CreatedAt,
+                        FilePath = record.FilePath,
+                        FileName = record.FileName
+                    };
+                    _producer.Publish("medical-record-created", message);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to publish medical record creation message");
+                    // Don't fail the record creation if notification fails
+                }
+
                 return ApiResponse<Record>.Ok(record, "Record uploaded successfully");
             }
             catch (Exception ex)
@@ -145,6 +184,34 @@ namespace MedicalRecordsService.Services
             }
 
             return ApiResponse<List<Record>>.Ok(records, "Records retrieved successfully");
+        }
+
+        private async Task<string?> GetPatientEmailAsync(Guid patientId)
+        {
+            try
+            {
+                // TODO: Add an endpoint in UserService to get user by ID for internal service calls
+                // For now, we'll publish the message without email and NotificationService will handle it
+                // Option 1: Add a public/internal endpoint in UserService: GET /api/user/{id}
+                // Option 2: Use service-to-service authentication token
+                
+                var httpClient = _httpClientFactory.CreateClient();
+                var userServiceUrl = _configuration["UserService:BaseUrl"] ?? "http://userservice:8080";
+                
+                // Try to get user from account endpoint (requires auth) or add a new internal endpoint
+                // For now, return null - NotificationService will log a warning if email is missing
+                _logger.LogInformation($"Attempting to fetch patient email for patient {patientId}");
+                
+                // Note: This will fail without authentication. 
+                // In production, add a service-to-service endpoint or use service tokens
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, $"Failed to fetch patient email for patient {patientId}");
+            }
+
+            return null;
         }
     }
 }

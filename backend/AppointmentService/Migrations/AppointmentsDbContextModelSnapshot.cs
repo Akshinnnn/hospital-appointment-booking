@@ -41,6 +41,11 @@ namespace AppointmentService.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("AppointmentNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("text");
@@ -57,6 +62,9 @@ namespace AppointmentService.Migrations
                         .HasDefaultValue(0);
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AppointmentNumber")
+                        .IsUnique();
 
                     b.HasIndex("DoctorId", "AppointmentTime")
                         .IsUnique();

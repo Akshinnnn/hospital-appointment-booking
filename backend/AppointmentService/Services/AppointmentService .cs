@@ -59,6 +59,8 @@ namespace AppointmentService.Services
                 entity.Status = AppointmentStatus.APPROVED;
             }
             
+            // Generate unique appointment number
+            entity.AppointmentNumber = await GenerateUniqueAppointmentNumberAsync();
 
             await _repository.CreateAsync(entity);
 
@@ -66,6 +68,34 @@ namespace AppointmentService.Services
 
             var resultDto = _mapper.Map<AppointmentDTO>(entity);
             return ApiResponse<AppointmentDTO>.Ok(resultDto, "Appointment created successfully");
+        }
+
+        private async Task<string> GenerateUniqueAppointmentNumberAsync()
+        {
+            string appointmentNumber;
+            bool isUnique = false;
+            int attempts = 0;
+            const int maxAttempts = 10;
+
+            do
+            {
+                // Generate appointment number: APT-YYYYMMDD-HHMMSS-XXXX (last 4 random digits)
+                var timestamp = DateTime.UtcNow;
+                var randomSuffix = new Random().Next(1000, 9999);
+                appointmentNumber = $"APT-{timestamp:yyyyMMdd}-{timestamp:HHmmss}-{randomSuffix}";
+
+                var existing = await _repository.GetByExpression(a => a.AppointmentNumber == appointmentNumber);
+                isUnique = !existing.Any();
+                attempts++;
+            } while (!isUnique && attempts < maxAttempts);
+
+            if (!isUnique)
+            {
+                // Fallback: use GUID if we can't generate a unique number
+                appointmentNumber = $"APT-{Guid.NewGuid().ToString("N").Substring(0, 12).ToUpper()}";
+            }
+
+            return appointmentNumber;
         }
 
 
