@@ -6,7 +6,7 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('jwt_token');
+  const token = typeof window !== 'undefined' ? localStorage.getItem('jwt_token') : null;
 
   console.log("Attaching token to request:", token);
   if (token) {
@@ -55,14 +55,20 @@ export const getDoctorSchedule = (doctorId: string, date: string) => {
 // export const createAppointment = (data: { doctorId: string; appointmentTime: string; notes?: string; }) => 
 //   api.post('/api/appointment', data);
 //MOCK
-export const createAppointment = (data: { doctorId: string; appointmentTime: string; notes?: string; }) => {
+export const createAppointment = (data: { 
+  doctorId: string; 
+  appointmentTime: string; 
+  notes?: string;
+  fullName?: string;
+  email?: string; 
+}) => {
   console.log("MOCK: Creating appointment with data:", data);
   return Promise.resolve({ 
     data: {
-      id: 'fake-appt-id-123',
+      id: 'fake-appt-id-' + Date.now(),
       ...data,
       status: 'APPROVED',
-      patientId: 'fake-patient-id-456'
+      patientId: data.fullName ? null : 'fake-patient-id-456'
     }
   });
 };
