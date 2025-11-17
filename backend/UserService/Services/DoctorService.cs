@@ -55,5 +55,29 @@ namespace UserService.Services
 
             return doctors;
         }
+
+        public async Task<List<string>> GetAllSpecialisationsAsync()
+        {
+            var cacheKey = "all_specialisations";
+
+            var cachedData = await _cache.GetStringAsync(cacheKey);
+            if (!string.IsNullOrEmpty(cachedData))
+            {
+                _logger.LogInformation("Cache hit for all specialisations");
+                return JsonSerializer.Deserialize<List<string>>(cachedData)!;
+            }
+
+            var specialisations = await _doctorRepository.GetAllSpecialisationsAsync();
+
+            var cacheOptions = new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
+            };
+            await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(specialisations), cacheOptions);
+
+            _logger.LogInformation("Cache miss for all specialisations. Data stored in cache.");
+
+            return specialisations;
+        }
     }
 }

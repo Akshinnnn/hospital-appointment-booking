@@ -3,15 +3,17 @@ import React from 'react';
 
 export default function MyAppointmentsPage() {
   return (
-    <section className="container max-w-4xl pl-6">
-      <header className="mb-6">
-        <h1 className="text-3xl font-bold">Appointments</h1>
-        <p className="text-muted-foreground">
-          View your upcoming and past appointments.
-        </p>
-      </header>
-      
-      <AppointmentList />
-    </section>
+    <div className="flex min-h-[calc(100vh-200px)] items-center justify-center py-8 px-4">
+      <div className="w-full max-w-4xl space-y-6">
+        <header className="text-center space-y-2">
+          <h1 className="text-4xl font-bold tracking-tight">Appointments</h1>
+          <p className="text-muted-foreground text-lg">
+            View your upcoming and past appointments
+          </p>
+        </header>
+        
+        <AppointmentList />
+      </div>
+    </div>
   );
 }

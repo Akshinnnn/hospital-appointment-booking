@@ -10,6 +10,7 @@ namespace UserService.Services
     public interface IDoctorService
     {
         Task<List<User>> GetDoctorsBySpecialisationAsync(string specialisation);
-        Task CreateDoctor(CreateDoctorDTO dto);  
+        Task CreateDoctor(CreateDoctorDTO dto);
+        Task<List<string>> GetAllSpecialisationsAsync();
     }
 }

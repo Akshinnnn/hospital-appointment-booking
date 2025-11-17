@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace AppointmentService.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -23,12 +23,19 @@ namespace AppointmentService.Migrations
                     AppointmentTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    AppointmentNumber = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     Notes = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Appointments", x => x.Id);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Appointments_AppointmentNumber",
+                table: "Appointments",
+                column: "AppointmentNumber",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Appointments_DoctorId_AppointmentTime",

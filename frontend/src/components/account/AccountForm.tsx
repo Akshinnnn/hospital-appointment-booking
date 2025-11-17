@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useSession } from 'next-auth/react';
 import { getAccountDetails, updateAccountDetails } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,7 @@ const accountSchema = z.object({
 type AccountFormData = z.infer<typeof accountSchema>;
 
 export const AccountForm = () => {
+  const { update } = useSession();
   const [isEditing, setIsEditing] = useState(false);
   const [account, setAccount] = useState<UserAccount | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
@@ -38,7 +40,8 @@ export const AccountForm = () => {
   useEffect(() => {
     getAccountDetails()
       .then(response => {
-        const user: UserAccount = response.data;
+        // Response interceptor already unwraps ApiResponse, but handle both cases
+        const user: UserAccount = response.data?.data || response.data;
         setAccount(user);
         form.reset({
           full_Name: user.full_Name,
@@ -60,6 +63,13 @@ export const AccountForm = () => {
         email: account?.email
       });
       setAccount(prev => prev ? { ...prev, ...data } : null);
+      
+      // Update the NextAuth session to reflect the new name in the navbar
+      await update({
+        ...data,
+        name: data.full_Name
+      });
+      
       setSuccessMessage('Your profile has been updated!');
       setIsEditing(false);
     } catch (error: any) {
@@ -85,11 +95,11 @@ export const AccountForm = () => {
   }
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle>Profile Details</CardTitle>
-          <CardDescription>
+    <Card className="shadow-lg">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+        <div className="space-y-1.5">
+          <CardTitle className="text-2xl">Profile Details</CardTitle>
+          <CardDescription className="text-base">
             {isEditing ? "Make changes to your profile." : "View your personal information."}
           </CardDescription>
         </div>
@@ -99,7 +109,7 @@ export const AccountForm = () => {
           </Button>
         )}
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         {isEditing ? (
           // --- EDITING MODE ---
           <Form {...form}>
@@ -158,18 +168,18 @@ export const AccountForm = () => {
           </Form>
         ) : (
           // --- VIEWING MODE ---
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">Full Name</label>
-              <p className="text-lg">{account.full_Name}</p>
+          <div className="space-y-6">
+            <div className="space-y-2 pb-4 border-b">
+              <label className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Full Name</label>
+              <p className="text-xl font-semibold">{account.full_Name}</p>
             </div>
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">Email Address</label>
-              <p className="text-lg">{account.email}</p>
+            <div className="space-y-2 pb-4 border-b">
+              <label className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Email Address</label>
+              <p className="text-xl font-semibold">{account.email}</p>
             </div>
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">Phone Number</label>
-              <p className="text-lg">{account.phone_Number || "Not provided"}</p>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Phone Number</label>
+              <p className="text-xl font-semibold">{account.phone_Number || "Not provided"}</p>
             </div>
           </div>
         )}

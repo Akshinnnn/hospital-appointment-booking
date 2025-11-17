@@ -1,6 +1,5 @@
 using AutoMapper;
 using Google.Cloud.Storage.V1;
-using Google.Cloud.Storage.V1.SignedUrls;
 using MedicalRecordService.Models;
 using MedicalRecordService.Models.DTOs;
 using MedicalRecordService.Services.Repositories;

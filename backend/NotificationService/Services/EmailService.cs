@@ -71,7 +71,8 @@ namespace NotificationService.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Failed to send appointment confirmation email to {appointment.Email}");
-                throw;
+                // Don't throw - allow appointment creation to succeed even if email fails
+                // In production, you might want to retry or use a queue
             }
         }
 

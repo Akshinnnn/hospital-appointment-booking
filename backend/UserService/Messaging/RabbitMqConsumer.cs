@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using UserService.Models.Entities;
 using UserService.Services.Repositories;
+using UserService.Services;
 
 namespace UserService.Messaging
 {
@@ -49,16 +50,9 @@ namespace UserService.Messaging
                 if (appointment != null)
                 {
                     using var scope = _scopeFactory.CreateScope();
-                    var slotRepo = scope.ServiceProvider.GetRequiredService<ISlotRepository>();
-
-                    var slot = await slotRepo.GetSlots(appointment.DoctorId, appointment.AppointmentTime.Date);
-                    var match = slot.FirstOrDefault(s => s.Start == appointment.AppointmentTime);
-
-                    if (match != null)
-                    {
-                        match.IsAvailable = false;
-                        await slotRepo.UpdateSlotAsync(match);
-                    }
+                    var scheduleService = scope.ServiceProvider.GetRequiredService<IScheduleService>();
+                    
+                    await scheduleService.BlockSlotAsync(appointment.DoctorId, appointment.AppointmentTime);
                 }
             };
 
@@ -75,16 +69,9 @@ namespace UserService.Messaging
                 if (appointment != null)
                 {
                     using var scope = _scopeFactory.CreateScope();
-                    var slotRepo = scope.ServiceProvider.GetRequiredService<ISlotRepository>();
-
-                    var slot = await slotRepo.GetSlots(appointment.DoctorId, appointment.AppointmentTime.Date);
-                    var match = slot.FirstOrDefault(s => s.Start == appointment.AppointmentTime);
-
-                    if (match != null)
-                    {
-                        match.IsAvailable = true; 
-                        await slotRepo.UpdateSlotAsync(match);
-                    }
+                    var scheduleService = scope.ServiceProvider.GetRequiredService<IScheduleService>();
+                    
+                    await scheduleService.UnblockSlotAsync(appointment.DoctorId, appointment.AppointmentTime);
                 }
             };
 

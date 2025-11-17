@@ -27,7 +27,6 @@ export const Navbar = () => {
         <>
           <NavLink href="/appointments" icon={Calendar}>Appointments</NavLink>
           <NavLink href="/records" icon={FileText}>Records</NavLink>
-          <NavLink href="/account" icon={User}>Account</NavLink>
         </>
       );
     }
@@ -36,7 +35,6 @@ export const Navbar = () => {
         <>
           <NavLink href="/appointments" icon={Calendar}>Appointments</NavLink>
           <NavLink href="/schedule" icon={Clock}>Schedule</NavLink>
-          <NavLink href="/account" icon={User}>Account</NavLink>
         </>
       );
     }
@@ -61,10 +59,17 @@ export const Navbar = () => {
     if (session) {
       return (
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-md bg-muted">
-            <User className="size-4 text-muted-foreground" />
-            <span className="text-sm font-medium">{session.user?.name}</span>
-          </div>
+          <Button 
+            variant="outline" 
+            size="sm"
+            asChild
+            className="hidden sm:flex items-center gap-2"
+          >
+            <Link href="/account">
+              <User className="size-4 text-muted-foreground" />
+              <span className="text-sm font-medium">{session.user?.name}</span>
+            </Link>
+          </Button>
           <Button 
             variant="outline" 
             size="sm"
@@ -134,10 +139,17 @@ export const Navbar = () => {
             {/* Mobile User Profile */}
             <div className="pt-3 border-t">
               {session && (
-                <div className="flex items-center gap-2 px-3 py-2 mb-2 rounded-md bg-muted">
-                  <User className="size-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">{session.user?.name}</span>
-                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  asChild
+                  className="w-full mb-2 justify-start gap-2"
+                >
+                  <Link href="/account">
+                    <User className="size-4 text-muted-foreground" />
+                    <span className="text-sm font-medium">{session.user?.name}</span>
+                  </Link>
+                </Button>
               )}
               <UserProfile />
             </div>

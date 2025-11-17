@@ -28,6 +28,11 @@ namespace AppointmentService.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("AppointmentNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.Property<DateTime>("AppointmentTime")
                         .HasColumnType("timestamp with time zone");
 
@@ -40,11 +45,6 @@ namespace AppointmentService.Migrations
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<string>("AppointmentNumber")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("FullName")
                         .IsRequired()

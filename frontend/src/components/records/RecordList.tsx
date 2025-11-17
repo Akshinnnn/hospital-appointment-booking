@@ -23,7 +23,11 @@ export const RecordList = () => {
         setIsLoading(true);
         setError(null);
         getMyRecords()
-        .then(response => setRecords(response.data))
+        .then(response => {
+            // Response interceptor already unwraps ApiResponse, but handle both cases
+            const recordsData = (response.data as any)?.data || response.data || [];
+            setRecords(Array.isArray(recordsData) ? recordsData : []);
+        })
         .catch(() => {
             setError("Could not fetch medical records.")
         })
@@ -33,18 +37,26 @@ export const RecordList = () => {
     }, []);
 
     if (isLoading) {
-        return <p>Loading your records...</p>
+        return (
+            <div className="flex items-center justify-center py-12">
+                <p className="text-muted-foreground">Loading your records...</p>
+            </div>
+        );
     }
 
     if (error) {
-        return <p className="text-red-500">{error}</p>
+        return (
+            <div className="flex items-center justify-center py-12">
+                <p className="text-red-500">{error}</p>
+            </div>
+        );
     }
 
     return (
         <div className="space-y-4">
         {records.length > 0 ? (
             records.map(record => (
-            <Card key={record.id}>
+            <Card key={record.id} className="shadow-md">
                 <CardHeader>
                 <CardTitle>Record: {record.diagnosis}</CardTitle>
                 <CardDescription>
@@ -52,15 +64,15 @@ export const RecordList = () => {
                 </CardDescription>
                 </CardHeader>
                 <CardContent>
-                <p>{record.notes}</p>
+                <p className="text-muted-foreground">{record.notes}</p>
                 </CardContent>
             </Card>
             ))
         ) : (
-            <Card className="flex flex-col items-center justify-center p-10">
+            <Card className="flex flex-col items-center justify-center p-10 shadow-md">
             <FileText size={48} className="text-muted-foreground" />
             <h3 className="mt-4 text-xl font-semibold">No Records Found</h3>
-            <p className="mt-2 text-muted-foreground">
+            <p className="mt-2 text-muted-foreground text-center">
                 Your medical records will appear here once they are available.
             </p>
             </Card>

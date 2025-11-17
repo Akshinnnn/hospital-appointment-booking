@@ -22,6 +22,8 @@ builder.Services.AddScoped<IAppointmentService, AppointmentService.Services.Appo
 
 builder.Services.AddSingleton<IRabbitMqProducer, RabbitMqProducer>();
 
+builder.Services.AddHttpClient();
+
 builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddAuthentication("Bearer")
@@ -49,6 +51,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
+        options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
     });
 

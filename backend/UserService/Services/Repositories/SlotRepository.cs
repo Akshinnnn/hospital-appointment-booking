@@ -23,9 +23,15 @@ namespace UserService.Services.Repositories
 
         public async Task<List<Slot>> GetSlots(Guid doctorId, DateTime date)
         {
-            var utcDate = date.ToUniversalTime();
+            // Ensure date is in UTC and get the start and end of the day
+            var utcDate = DateTime.SpecifyKind(date.Date, DateTimeKind.Utc);
+            var startOfDay = utcDate.Date;
+            var endOfDay = startOfDay.AddDays(1);
+            
             return await _dbContext.Slots
-                .Where(s => s.DoctorId == doctorId && s.Start.Date == utcDate.Date)
+                .Where(s => s.DoctorId == doctorId 
+                    && s.Start >= startOfDay 
+                    && s.Start < endOfDay)
                 .OrderBy(s => s.Start)
                 .ToListAsync();
         }
