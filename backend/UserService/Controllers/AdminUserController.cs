@@ -28,6 +28,16 @@ namespace UserService.Controllers
             return Ok(users);
         }
 
+        [AllowAnonymous]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUserById([FromRoute] Guid id)
+        {
+            var result = await _userService.GetUserProfileAsync(id);
+            if (!result.Success)
+                return NotFound(result);
+            return Ok(result);
+        }
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser([FromRoute] Guid id, [FromBody] User user)
         {

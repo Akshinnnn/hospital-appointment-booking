@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AppointmentService.Migrations
 {
     [DbContext(typeof(AppointmentsDbContext))]
-    [Migration("20251009130635_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20251117150117_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -30,6 +30,11 @@ namespace AppointmentService.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<string>("AppointmentNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<DateTime>("AppointmentTime")
                         .HasColumnType("timestamp with time zone");
@@ -60,6 +65,9 @@ namespace AppointmentService.Migrations
                         .HasDefaultValue(0);
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AppointmentNumber")
+                        .IsUnique();
 
                     b.HasIndex("DoctorId", "AppointmentTime")
                         .IsUnique();

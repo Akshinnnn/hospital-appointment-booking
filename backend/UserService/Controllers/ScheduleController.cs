@@ -6,7 +6,6 @@ using UserService.Services;
 namespace UserService.Controllers;
 [ApiController]
 [Route("api")]
-[Authorize(Roles = "DOCTOR, ADMIN")]
 public class ScheduleController : ControllerBase
 {
     private readonly IScheduleService _scheduleService;
@@ -17,6 +16,7 @@ public class ScheduleController : ControllerBase
     }
 
     // POST: api/schedule
+    [Authorize(Roles = "DOCTOR, ADMIN")]
     [HttpPost("schedule")]
     public async Task<IActionResult> AddSchedule([FromBody] AddScheduleDTO dto)
     {
@@ -35,24 +35,43 @@ public class ScheduleController : ControllerBase
         }
     }
 
-    // GET: api/{doctorId}/schedule
+    // GET: api/schedule/doctor/{doctorId}
     [AllowAnonymous]
-    [HttpGet("{doctorId}/schedule")]
+    [HttpGet("schedule/doctor/{doctorId}")]
     public async Task<IActionResult> GetSlots(Guid doctorId, [FromQuery] DateTime date)
     {
         try
         {
-            var dateUtc = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+            Console.WriteLine($"GetSlots called with doctorId: {doctorId}, date: {date}, date.Kind: {date.Kind}");
+            
+            if (doctorId == Guid.Empty)
+                return BadRequest("Invalid doctor ID");
+            
+            if (date == default(DateTime))
+            {
+                Console.WriteLine("ERROR: Date parameter is default (not provided)");
+                return BadRequest("Date parameter is required");
+            }
+            
+            var dateUtc = DateTime.SpecifyKind(date.Date, DateTimeKind.Utc);
+            Console.WriteLine($"Fetching slots for doctor {doctorId} on {dateUtc}");
+            
             var slots = await _scheduleService.GetSlots(doctorId, dateUtc);
+            Console.WriteLine($"Found {slots?.Count ?? 0} slots");
+            
+            // Return the slots (will be empty list if none exist)
             return Ok(slots);
         }
         catch (Exception ex)
         {
-            return NotFound(ex.Message);
+            Console.WriteLine($"ERROR in GetSlots: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            return BadRequest(new { message = ex.Message });
         }
     }
 
     // GET api/schedule/{scheduleId}
+    [Authorize(Roles = "DOCTOR, ADMIN")]
     [HttpGet("schedule/{scheduleId}")]
     public async Task<IActionResult> GetScheduleById([FromRoute] Guid scheduleId)
     {
@@ -68,6 +87,7 @@ public class ScheduleController : ControllerBase
     }
 
     // PUT: api/schedule/{scheduleId}
+    [Authorize(Roles = "DOCTOR, ADMIN")]
     [HttpPut("schedule/{scheduleId}")]
     public async Task<IActionResult> UpdateSchedule([FromRoute] Guid scheduleId, [FromBody] ScheduleDTO dto)
     {
@@ -83,6 +103,7 @@ public class ScheduleController : ControllerBase
     }
 
     // DELETE: api/schedule/{scheduleId}
+    [Authorize(Roles = "DOCTOR, ADMIN")]
     [HttpDelete("schedule/{scheduleId}")]
     public async Task<IActionResult> DeleteSchedule([FromRoute] Guid scheduleId)
     {

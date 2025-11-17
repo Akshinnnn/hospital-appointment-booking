@@ -11,5 +11,6 @@ namespace UserService.Services
         Task UpdateSchedule(Guid guid, ScheduleDTO dto);
         Task<List<TimeSlotDTO>> GetSlots(Guid doctorId, DateTime date);
         Task BlockSlotAsync(Guid doctorId, DateTime appointmentTime);
+        Task UnblockSlotAsync(Guid doctorId, DateTime appointmentTime);
     }
 }

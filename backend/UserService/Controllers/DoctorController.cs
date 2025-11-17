@@ -22,6 +22,14 @@ namespace UserService.Controllers
         }
 
         [AllowAnonymous]
+        [HttpGet("specialisations")]
+        public async Task<IActionResult> GetSpecialisations()
+        {
+            var specialisations = await _doctorService.GetAllSpecialisationsAsync();
+            return Ok(specialisations);
+        }
+
+        [AllowAnonymous]
         [HttpGet("{specialisation}")]
         public async Task<IActionResult> GetDoctorsBySpecialisation(string specialisation)
         {

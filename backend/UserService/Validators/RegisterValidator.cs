@@ -26,8 +26,14 @@ namespace UserService.Validators
     {
         public UpdateValidator()
         {
-            RuleFor(x => x.Full_Name).NotEmpty();
-            RuleFor(x => x.Phone_Number).Matches(@"^\+?\d{7,15}$")
+            RuleFor(x => x.Full_Name)
+                .NotEmpty()
+                .MinimumLength(2)
+                .When(x => !string.IsNullOrWhiteSpace(x.Full_Name));
+            
+            RuleFor(x => x.Phone_Number)
+                .Matches(@"^[\d\s\-\(\)\+\.]{7,20}$")
+                .WithMessage("Phone number must be 7-20 characters and contain only digits, spaces, dashes, parentheses, plus, or dots")
                 .When(x => !string.IsNullOrWhiteSpace(x.Phone_Number));
         }
     }

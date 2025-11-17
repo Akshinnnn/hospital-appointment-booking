@@ -13,5 +13,7 @@ namespace AppointmentService.Models.DTOs.AppointmentDTOs
         public AppointmentStatus Status { get; set; }
         public string AppointmentNumber { get; set; } = string.Empty;
         public string? Notes { get; set; }
+        public string? DoctorName { get; set; }
+        public string? Specialization { get; set; }
     }
 }

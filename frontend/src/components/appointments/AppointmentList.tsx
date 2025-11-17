@@ -25,24 +25,31 @@ interface Appointment {
   notes?: string;
   doctorName?: string;
   specialization?: string;
+  appointmentNumber?: string;
+  fullName?: string;
+  email?: string;
 }
 
 const AppointmentCard = ({ appt, onCancel }: { appt: Appointment, onCancel: (id: string) => void }) => {
   const isUpcoming = new Date(appt.appointmentTime) > new Date();
+  const doctorName = appt.doctorName ? `Dr. ${appt.doctorName}` : 'Unknown Doctor';
   
   return (
-    <Card>
+    <Card className="shadow-md">
       <CardHeader>
-        <CardTitle>Appointment with Dr. [Doctor Name]</CardTitle>
+        <CardTitle>Appointment with {doctorName}</CardTitle>
         <p className="text-sm text-muted-foreground">
           {new Date(appt.appointmentTime).toLocaleString(undefined, {
             dateStyle: 'full',
             timeStyle: 'short',
           })}
         </p>
+        {appt.appointmentNumber && (
+          <p className="text-xs text-muted-foreground">Appointment #: {appt.appointmentNumber}</p>
+        )}
       </CardHeader>
       <CardContent>
-        <p><span className="font-semibold">Specialization:</span> [Specialization]</p>
+        <p><span className="font-semibold">Specialization:</span> {appt.specialization || 'N/A'}</p>
         <p><span className="font-semibold">Status:</span> 
           <span className={`font-medium ${appt.status === 'APPROVED' ? 'text-green-600' : 'text-red-600'}`}>
             {appt.status}
@@ -87,7 +94,9 @@ export const AppointmentList = () => {
     setError(null);
     getMyAppointments()
       .then(response => {
-        setAppointments(response.data);
+        // Response interceptor already unwraps ApiResponse, but handle both cases
+        const appointments = response.data?.data || response.data || [];
+        setAppointments(Array.isArray(appointments) ? appointments : []);
       })
       .catch(() => {
         setError('Could not fetch your appointments.');
@@ -112,19 +121,27 @@ export const AppointmentList = () => {
   };
 
   if (isLoading) {
-    return <p>Loading your appointments...</p>;
+    return (
+      <div className="flex items-center justify-center py-12">
+        <p className="text-muted-foreground">Loading your appointments...</p>
+      </div>
+    );
   }
 
   if (error) {
-    return <p className="text-red-500">{error}</p>;
+    return (
+      <div className="flex items-center justify-center py-12">
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
   }
 
   const upcomingAppointments = appointments
-    .filter(a => new Date(a.appointmentTime) > new Date())
+    .filter(a => a.status !== 'CANCELLED' && new Date(a.appointmentTime) > new Date())
     .sort((a, b) => new Date(a.appointmentTime).getTime() - new Date(b.appointmentTime).getTime());
     
   const pastAppointments = appointments
-    .filter(a => new Date(a.appointmentTime) <= new Date())
+    .filter(a => a.status !== 'CANCELLED' && new Date(a.appointmentTime) <= new Date())
     .sort((a, b) => new Date(b.appointmentTime).getTime() - new Date(a.appointmentTime).getTime());
 
   return (
@@ -134,26 +151,30 @@ export const AppointmentList = () => {
         <TabsTrigger value="past">Past</TabsTrigger>
       </TabsList>
       
-      <TabsContent value="upcoming">
+      <TabsContent value="upcoming" className="mt-6">
         <div className="space-y-4">
           {upcomingAppointments.length > 0 ? (
             upcomingAppointments.map(appt => (
               <AppointmentCard key={appt.id} appt={appt} onCancel={handleCancel} />
             ))
           ) : (
-            <p>You have no upcoming appointments.</p>
+            <div className="flex items-center justify-center py-12">
+              <p className="text-muted-foreground">You have no upcoming appointments.</p>
+            </div>
           )}
         </div>
       </TabsContent>
       
-      <TabsContent value="past">
+      <TabsContent value="past" className="mt-6">
         <div className="space-y-4">
           {pastAppointments.length > 0 ? (
             pastAppointments.map(appt => (
               <AppointmentCard key={appt.id} appt={appt} onCancel={handleCancel} />
             ))
           ) : (
-            <p>You have no past appointments.</p>
+            <div className="flex items-center justify-center py-12">
+              <p className="text-muted-foreground">You have no past appointments.</p>
+            </div>
           )}
         </div>
       </TabsContent>

@@ -13,6 +13,7 @@ namespace UserService.Services.Repositories
         Task<List<User>> GetDoctorsBySpecialisationAsync(string specialisation);
         Task CreateDoctorAsync(User doctor);
         Task UpdateDoctorSpecialisationAsync(User doctor);
+        Task<List<string>> GetAllSpecialisationsAsync();
     }
 
 
@@ -42,6 +43,16 @@ namespace UserService.Services.Repositories
         {
             _dbContext.Users.Update(doctor);
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<List<string>> GetAllSpecialisationsAsync()
+        {
+            return await _dbContext.Users
+                .Where(u => u.Role == UserRole.DOCTOR && !string.IsNullOrEmpty(u.Specialisation))
+                .Select(u => u.Specialisation!)
+                .Distinct()
+                .OrderBy(s => s)
+                .ToListAsync();
         }
     }
 }

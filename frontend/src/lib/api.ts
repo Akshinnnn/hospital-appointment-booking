@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { log } from 'console';
 
 const api = axios.create({
   baseURL: "http://localhost:8080",
@@ -8,69 +7,85 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('jwt_token') : null;
 
-  console.log("Attaching token to request:", token);
+  console.log("=== API Request ===");
+  console.log("URL:", config.url);
+  console.log("Method:", config.method);
+  console.log("Token found:", token ? "Yes" : "No (Anonymous)");
+  
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 }, (error) => {
+  console.error("Request interceptor error:", error);
   return Promise.reject(error);
 });
 
+// Response interceptor to handle ApiResponse<T> structure
+api.interceptors.response.use(
+  (response) => {
+    // Backend returns ApiResponse<T> with structure: { success: true, data: T, message: string }
+    // Unwrap the data property automatically, but skip arrays (they're returned directly)
+    if (response.data && typeof response.data === 'object' && !Array.isArray(response.data)) {
+      // Check if it's an ApiResponse structure
+      if ('data' in response.data && ('success' in response.data || 'Success' in response.data)) {
+        // Return the unwrapped data
+        response.data = response.data.data || response.data.Data;
+      }
+    }
+    return response;
+  },
+  (error) => {
+    // Handle error responses - they also use ApiResponse structure
+    if (error.response?.data && typeof error.response.data === 'object' && !Array.isArray(error.response.data)) {
+      if ('message' in error.response.data || 'Message' in error.response.data) {
+        error.response.data.message = error.response.data.message || error.response.data.Message;
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 // --- API Service Functions ---
-//export const getSpecializations = () => api.get<string[]>('/api/doctor/specialisations');
-//MOCK
-export const getSpecializations = () => {
-  return Promise.resolve({ 
-    data: ['Cardiology', 'Dermatology', 'Neurology', 'Pediatrics'] 
-  });
-};
+export const getSpecializations = () => api.get<string[]>('/api/doctor/specialisations');
 
-// export const getDoctorsBySpecialization = (specialization: string) => 
-//   api.get(`/api/doctor/${specialization}`);
-//MOCK
-export const getDoctorsBySpecialization = (specialization: string) => {
-  console.log("MOCK: Fetching doctors for", specialization);
-  const fakeDoctors = [
-    { id: 'doc-1', full_Name: `Dr. Alice Smith (${specialization})` },
-    { id: 'doc-2', full_Name: `Dr. Bob Johnson (${specialization})` },
-  ];
-  return Promise.resolve({ data: fakeDoctors });
-};
+export const getDoctorsBySpecialization = (specialization: string) => 
+  api.get(`/api/doctor/${encodeURIComponent(specialization)}`);
 
-// export const getDoctorSchedule = (doctorId: string, date: string) => 
-//   api.get(`/api/${doctorId}/schedule?date=${date}`);
-//MOCK
 export const getDoctorSchedule = (doctorId: string, date: string) => {
-  console.log("MOCK: Fetching schedule for doctor", doctorId, "on", date);
-  const fakeSchedule = [
-    { start: `${date}T09:00:00Z`, end: `${date}T09:30:00Z`, isAvailable: true },
-    { start: `${date}T09:30:00Z`, end: `${date}T10:00:00Z`, isAvailable: true },
-    { start: `${date}T10:00:00Z`, end: `${date}T10:30:00Z`, isAvailable: false },
-    { start: `${date}T10:30:00Z`, end: `${date}T11:00:00Z`, isAvailable: true },
-  ];
-  return Promise.resolve({ data: fakeSchedule });
+  // Format date as ISO string for the backend
+  // Ensure the date is sent at UTC midnight to avoid timezone issues
+  const dateObj = new Date(date + 'T00:00:00Z');
+  const isoDate = dateObj.toISOString();
+  const url = `/api/schedule/doctor/${doctorId}?date=${encodeURIComponent(isoDate)}`;
+  
+  console.log('getDoctorSchedule called with:', { doctorId, date, isoDate, url });
+  
+  return api.get(url);
 };
 
-// export const createAppointment = (data: { doctorId: string; appointmentTime: string; notes?: string; }) => 
-//   api.post('/api/appointment', data);
-//MOCK
-export const createAppointment = (data: { 
-  doctorId: string; 
-  appointmentTime: string; 
+export const createAppointment = (data: {
+  doctorId: string;
+  appointmentTime: string | Date;
   notes?: string;
   fullName?: string;
   email?: string; 
 }) => {
-  console.log("MOCK: Creating appointment with data:", data);
-  return Promise.resolve({ 
-    data: {
-      id: 'fake-appt-id-' + Date.now(),
-      ...data,
-      status: 'APPROVED',
-      patientId: data.fullName ? null : 'fake-patient-id-456'
-    }
-  });
+  // Convert appointmentTime to ISO string if it's not already
+  const appointmentTime = typeof data.appointmentTime === 'string'
+    ? new Date(data.appointmentTime).toISOString() 
+    : data.appointmentTime.toISOString();
+  
+  // Map to backend DTO structure (backend uses camelCase due to PropertyNamingPolicy)
+  const appointmentDTO = {
+    doctorId: data.doctorId,
+    appointmentTime: appointmentTime,
+    notes: data.notes || null,
+    fullName: data.fullName || null,
+    email: data.email || null,
+  };
+  
+  return api.post('/api/appointment', appointmentDTO);
 };
 
 export const getMyAppointments = () => api.get('/api/appointment/myappointments')
@@ -102,8 +117,7 @@ export const registerUser = (data: {
   password?: string;
   phone_Number?: string;
 }) => {
-
-  return axios.post("http://localhost:8080/api/auth/register", data);
+  return api.post('/api/auth/register', data);
 }
 
 export default api;

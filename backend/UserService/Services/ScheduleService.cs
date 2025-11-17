@@ -166,6 +166,17 @@ public class ScheduleService : IScheduleService
             await InvalidateDoctorSlotCache(doctorId, appointmentTime);
         }
     }
+
+    public async Task UnblockSlotAsync(Guid doctorId, DateTime appointmentTime)
+    {
+        var slot = await _slotRepository.GetSlot(doctorId, appointmentTime);
+        if (slot != null)
+        {
+            slot.IsAvailable = true;
+            await _slotRepository.UpdateSlotAsync(slot);
+            await InvalidateDoctorSlotCache(doctorId, appointmentTime);
+        }
+    }
     
     private async Task InvalidateDoctorSlotCache(Guid doctorId, DateTime date)
     {

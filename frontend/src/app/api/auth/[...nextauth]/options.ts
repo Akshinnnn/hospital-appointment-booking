@@ -17,7 +17,8 @@ export const authOptions: NextAuthOptions = {
         }
         
         try {
-          const response = await fetch(`${process.env.API_URL}/api/auth/login`, {
+          const apiUrl = process.env.API_URL || 'http://userservice:8080';
+          const response = await fetch(`${apiUrl}/api/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -26,29 +27,37 @@ export const authOptions: NextAuthOptions = {
             }),
           });
 
-          if (!response.ok) return null;
+          if (!response.ok) {
+            console.error("Login response not OK:", response.status, response.statusText);
+            return null;
+          }
 
           const data = await response.json();
+          console.log("Login response data:", data);
 
-          const token = data.token
+          // Backend returns ApiResponse<string> with structure: { success: true, data: "token", message: "..." }
+          // Try both camelCase and PascalCase
+          const token = data.data || data.Data;
 
-          if (token) {
-            const decoded: any = jwtDecode(token);
-
-            console.log("DECODED TOKEN FROM BACKEND:", decoded);
-
-            const user = {
-              id: decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'],
-              name: decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'],
-              email: credentials.email,
-              role: decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'],
-              accessToken: token,
-            };
-            console.log("CORRECTLY MAPPED USER OBJECT:", user);
-
-            return user;
+          if (!token) {
+            console.error("No token in response:", data);
+            return null;
           }
-          return null;
+
+          const decoded: any = jwtDecode(token);
+
+          console.log("DECODED TOKEN FROM BACKEND:", decoded);
+
+          const user = {
+            id: decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'],
+            name: decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'],
+            email: credentials.email,
+            role: decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'],
+            accessToken: token,
+          };
+          console.log("CORRECTLY MAPPED USER OBJECT:", user);
+
+          return user;
         } catch (error) {
           console.error("Login error:", error);
           return null;
@@ -60,13 +69,20 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
+      // Initial sign in
       if (user) {
         token.id = user.id;
         token.name = user.name;
         token.role = (user as any).role;
         token.accessToken = (user as any).accessToken
       }
+      
+      // Handle session update (when update() is called)
+      if (trigger === "update" && session?.name) {
+        token.name = session.name;
+      }
+      
       return token;
     },
 
