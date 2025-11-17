@@ -46,7 +46,7 @@ namespace UserService.Data
                 // ============= DOCTORS =============
                 new User
                 {
-                    Full_Name = "Dr. John Smith",
+                    Full_Name = "John Smith",
                     Email = "john.smith@hospital.com",
                     Password = BCrypt.Net.BCrypt.HashPassword("doctor123"),
                     Role = UserRole.DOCTOR,
@@ -56,7 +56,7 @@ namespace UserService.Data
                 },
                 new User
                 {
-                    Full_Name = "Dr. Sarah Lee",
+                    Full_Name = "Sarah Lee",
                     Email = "sarah.lee@hospital.com",
                     Password = BCrypt.Net.BCrypt.HashPassword("doctor123"),
                     Role = UserRole.DOCTOR,
@@ -66,7 +66,7 @@ namespace UserService.Data
                 },
                 new User
                 {
-                    Full_Name = "Dr. Michael Chen",
+                    Full_Name = "Michael Chen",
                     Email = "michael.chen@hospital.com",
                     Password = BCrypt.Net.BCrypt.HashPassword("doctor123"),
                     Role = UserRole.DOCTOR,
@@ -76,7 +76,7 @@ namespace UserService.Data
                 },
                 new User
                 {
-                    Full_Name = "Dr. Emily Davis",
+                    Full_Name = "Emily Davis",
                     Email = "emily.davis@hospital.com",
                     Password = BCrypt.Net.BCrypt.HashPassword("doctor123"),
                     Role = UserRole.DOCTOR,
@@ -86,7 +86,7 @@ namespace UserService.Data
                 },
                 new User
                 {
-                    Full_Name = "Dr. Robert Johnson",
+                    Full_Name = "Robert Johnson",
                     Email = "robert.johnson@hospital.com",
                     Password = BCrypt.Net.BCrypt.HashPassword("doctor123"),
                     Role = UserRole.DOCTOR,
@@ -96,7 +96,7 @@ namespace UserService.Data
                 },
                 new User
                 {
-                    Full_Name = "Dr. Lisa Martinez",
+                    Full_Name = "Lisa Martinez",
                     Email = "lisa.martinez@hospital.com",
                     Password = BCrypt.Net.BCrypt.HashPassword("doctor123"),
                     Role = UserRole.DOCTOR,
@@ -106,7 +106,7 @@ namespace UserService.Data
                 },
                 new User
                 {
-                    Full_Name = "Dr. David Kim",
+                    Full_Name = "David Kim",
                     Email = "david.kim@hospital.com",
                     Password = BCrypt.Net.BCrypt.HashPassword("doctor123"),
                     Role = UserRole.DOCTOR,
@@ -116,7 +116,7 @@ namespace UserService.Data
                 },
                 new User
                 {
-                    Full_Name = "Dr. Jennifer Brown",
+                    Full_Name = "Jennifer Brown",
                     Email = "jennifer.brown@hospital.com",
                     Password = BCrypt.Net.BCrypt.HashPassword("doctor123"),
                     Role = UserRole.DOCTOR,
@@ -126,7 +126,7 @@ namespace UserService.Data
                 },
                 new User
                 {
-                    Full_Name = "Dr. William Taylor",
+                    Full_Name = "William Taylor",
                     Email = "william.taylor@hospital.com",
                     Password = BCrypt.Net.BCrypt.HashPassword("doctor123"),
                     Role = UserRole.DOCTOR,
@@ -136,7 +136,7 @@ namespace UserService.Data
                 },
                 new User
                 {
-                    Full_Name = "Dr. Amanda White",
+                    Full_Name = "Amanda White",
                     Email = "amanda.white@hospital.com",
                     Password = BCrypt.Net.BCrypt.HashPassword("doctor123"),
                     Role = UserRole.DOCTOR,
