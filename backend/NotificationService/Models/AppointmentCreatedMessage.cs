@@ -6,6 +6,7 @@ namespace NotificationService.Models
         public string FullName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public Guid DoctorId { get; set; }
+        public string? DoctorName { get; set; }
         public Guid? PatientId { get; set; }
         public DateTime AppointmentTime { get; set; }
         public string AppointmentNumber { get; set; } = string.Empty;
