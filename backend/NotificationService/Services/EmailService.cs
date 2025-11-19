@@ -3,6 +3,7 @@ using MailKit.Security;
 using MimeKit;
 using NotificationService.Models;
 using System;
+using System.Text.Json;
 
 namespace NotificationService.Services
 {
@@ -10,17 +11,61 @@ namespace NotificationService.Services
     {
         private readonly IConfiguration _configuration;
         private readonly ILogger<EmailService> _logger;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public EmailService(IConfiguration configuration, ILogger<EmailService> logger)
+        public EmailService(IConfiguration configuration, ILogger<EmailService> logger, IHttpClientFactory httpClientFactory)
         {
             _configuration = configuration;
             _logger = logger;
+            _httpClientFactory = httpClientFactory;
+        }
+
+        private async Task<string?> GetDoctorNameAsync(Guid doctorId)
+        {
+            try
+            {
+                var httpClient = _httpClientFactory.CreateClient();
+                httpClient.Timeout = TimeSpan.FromSeconds(2);
+                var userServiceUrl = _configuration["UserService:BaseUrl"] ?? "http://userservice:8080";
+                var url = $"{userServiceUrl}/api/user/{doctorId}";
+                
+                var response = await httpClient.GetAsync(url);
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var apiResponse = JsonSerializer.Deserialize<JsonElement>(content);
+                    
+                    if (apiResponse.TryGetProperty("data", out var dataElement))
+                    {
+                        JsonElement fullNameElement;
+                        if (dataElement.TryGetProperty("full_Name", out fullNameElement) || 
+                            dataElement.TryGetProperty("fullName", out fullNameElement))
+                        {
+                            return fullNameElement.GetString();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to fetch doctor name for doctor {DoctorId}", doctorId);
+            }
+            
+            return null;
         }
 
         public async Task SendAppointmentConfirmationEmailAsync(AppointmentCreatedMessage appointment)
         {
             try
             {
+                // Fetch doctor name if not already provided
+                var doctorName = appointment.DoctorName;
+                if (string.IsNullOrEmpty(doctorName))
+                {
+                    doctorName = await GetDoctorNameAsync(appointment.DoctorId) ?? "Dr. [Doctor Name]";
+                }
+
                 var message = new MimeMessage();
                 message.From.Add(new MailboxAddress(
                     _configuration["EmailSettings:SenderName"] ?? "Hospital Booking System",
@@ -39,8 +84,9 @@ namespace NotificationService.Services
                                 <p>Your appointment has been successfully confirmed.</p>
                                 <div style='background-color: #f4f4f4; padding: 15px; border-radius: 5px; margin: 20px 0;'>
                                     <p><strong>Appointment Number:</strong> {appointment.AppointmentNumber}</p>
+                                    <p><strong>Doctor:</strong> {doctorName}</p>
                                     <p><strong>Appointment Date & Time:</strong> {appointment.AppointmentTime:dddd, MMMM dd, yyyy 'at' HH:mm}</p>
-                                    <p><strong>Doctor ID:</strong> {appointment.DoctorId}</p>
+                                    
                                     {(string.IsNullOrEmpty(appointment.Notes) ? "" : $"<p><strong>Notes:</strong> {appointment.Notes}</p>")}
                                 </div>
                                 <p>Please keep your appointment number <strong>{appointment.AppointmentNumber}</strong> for your records. You can use this number to access your appointment details.</p>
@@ -80,6 +126,13 @@ namespace NotificationService.Services
         {
             try
             {
+                // Fetch doctor name if not already provided
+                var doctorName = record.DoctorName;
+                if (string.IsNullOrEmpty(doctorName))
+                {
+                    doctorName = await GetDoctorNameAsync(record.Doctor_Id) ?? "Dr. [Doctor Name]";
+                }
+
                 var message = new MimeMessage();
                 message.From.Add(new MailboxAddress(
                     _configuration["EmailSettings:SenderName"] ?? "Hospital Booking System",
@@ -98,6 +151,7 @@ namespace NotificationService.Services
                                 <p>A new medical record has been created for you.</p>
                                 <div style='background-color: #f4f4f4; padding: 15px; border-radius: 5px; margin: 20px 0;'>
                                     <p><strong>Record Title:</strong> {record.Title ?? "N/A"}</p>
+                                    <p><strong>Doctor:</strong> {doctorName}</p>
                                     <p><strong>Description:</strong> {record.Description ?? "N/A"}</p>
                                     <p><strong>Created Date:</strong> {record.CreatedAt:dddd, MMMM dd, yyyy 'at' HH:mm}</p>
                                     {(string.IsNullOrEmpty(record.FileName) ? "" : $"<p><strong>File:</strong> {record.FileName}</p>")}

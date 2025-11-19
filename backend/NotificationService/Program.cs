@@ -3,6 +3,7 @@ using NotificationService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddHttpClient();
 builder.Services.AddSingleton<IEmailService, EmailService>();
 builder.Services.AddSingleton<RabbitMqConsumer>();
 
