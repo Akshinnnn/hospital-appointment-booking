@@ -92,13 +92,76 @@ export const getMyAppointments = () => api.get('/api/appointment/myappointments'
 
 export const cancelAppointment = (id: string) => api.put(`/api/appointment/${id}`, { status: 'CANCELLED' });
 
-//MOCK
-export const getMyRecords = () => {
-  console.log("Fetching medical records...");
+// --- Schedule APIs ---
+export const createSchedule = (startTime: Date, endTime: Date) => {
+  const scheduleDTO = {
+    start_Time: startTime.toISOString(),
+    end_Time: endTime.toISOString(),
+  };
+  return api.post('/api/schedule', scheduleDTO);
+};
+
+export const getScheduleById = (scheduleId: string) => 
+  api.get(`/api/schedule/${scheduleId}`);
+
+export const updateSchedule = (scheduleId: string, startTime: Date, endTime: Date) => {
+  const scheduleDTO = {
+    start_Time: startTime.toISOString(),
+    end_Time: endTime.toISOString(),
+  };
+  return api.put(`/api/schedule/${scheduleId}`, scheduleDTO);
+};
+
+export const deleteSchedule = (scheduleId: string) => 
+  api.delete(`/api/schedule/${scheduleId}`);
+
+// --- Medical Records APIs ---
+export const uploadMedicalRecord = (
+  patientId: string, 
+  title: string, 
+  description: string, 
+  file: File
+) => {
+  const formData = new FormData();
+  formData.append('patient_Id', patientId);
+  if (title) formData.append('title', title);
+  if (description) formData.append('description', description);
+  formData.append('file', file);
   
-  //return api.get('/api/records/myrecords');
-  return Promise.resolve({ data: [] });
-}
+  return api.post('/api/record', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+};
+
+export const getMedicalRecordById = (recordId: string) => 
+  api.get(`/api/record/${recordId}`);
+
+export const getMyMedicalRecords = () => 
+  api.get('/api/record/myrecords');
+
+export const updateMedicalRecord = (
+  recordId: string, 
+  title?: string, 
+  description?: string
+) => {
+  const updateDTO: {
+    title?: string;
+    description?: string;
+  } = {};
+  
+  if (title !== undefined) updateDTO.title = title;
+  if (description !== undefined) updateDTO.description = description;
+  
+  return api.put(`/api/record/${recordId}`, updateDTO);
+};
+
+export const deleteMedicalRecord = (recordId: string) => 
+  api.delete(`/api/record/${recordId}`);
+
+// --- Medical Records (Legacy - for patient side) ---
+export const getMyRecords = () => api.get('/api/record/myrecords');
 
 export const getAccountDetails = () => api.get('/api/account');
 
