@@ -38,11 +38,25 @@ export interface Appointment {
   id: string;
   doctorId: string;
   patientId?: string;
-  appointmentTime: string;
-  status: AppointmentStatus;
-  notes?: string;
   fullName: string;
   email: string;
+  appointmentTime: string;
+  status: AppointmentStatus;
+  appointmentNumber: string;
+  notes?: string;
+  doctorName?: string;
+  specialization?: string;
+}
+
+// Schedule DTOs (for API requests/responses)
+export interface AddScheduleDTO {
+  start_Time: string; // ISO string
+  end_Time: string; // ISO string
+}
+
+export interface ScheduleDTO {
+  start_Time: string; // ISO string
+  end_Time: string; // ISO string
 }
 
 export interface DoctorSchedule {
@@ -52,20 +66,32 @@ export interface DoctorSchedule {
   end_Time: string;
 }
 
+// TimeSlotDTO from backend doesn't include id/doctorId
 export interface TimeSlot {
-  id: string; 
-  doctorId: string;
-  start: string; 
-  end:string; 
+  start: string; // ISO string
+  end: string; // ISO string
   isAvailable: boolean;
 }
 
 // --- Medical Record Models ---
+export interface AddMedicalRecordDTO {
+  patient_Id: string;
+  title?: string;
+  description?: string;
+  file: File;
+}
+
+export interface UpdateMedicalRecordDTO {
+  title?: string;
+  description?: string;
+  contentType?: string;
+}
+
 export interface MedicalRecord {
   id: string;
   patient_Id: string;
   doctor_Id: string;
-  title: string;
+  title?: string;
   description?: string;
   createdAt: string;
   filePath?: string;

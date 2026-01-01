@@ -75,7 +75,7 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.name = user.name;
         token.role = (user as any).role;
-        token.accessToken = (user as any).accessToken
+        token.accessToken = (user as any).accessToken;
       }
       
       // Handle session update (when update() is called)
@@ -92,7 +92,9 @@ export const authOptions: NextAuthOptions = {
         session.user.name = token.name;
         (session.user as any).role = token.role;
       }
-      session.accessToken = token.accessToken as string;
+      if (token.accessToken) {
+        session.accessToken = token.accessToken as string;
+      }
       return session;
     }
   },
