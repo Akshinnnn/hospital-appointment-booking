@@ -87,9 +87,9 @@ export function PatientSelector({ value, onValueChange, disabled }: PatientSelec
               </SelectItem>
             ))
           ) : (
-            <SelectItem value="" disabled>
-              No patients found. Please have appointments with patients first.
-            </SelectItem>
+            <div className="px-2 py-1.5 text-sm text-muted-foreground">
+              No patients found
+            </div>
           )}
         </SelectContent>
       </Select>

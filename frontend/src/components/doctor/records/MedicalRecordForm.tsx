@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { PatientSelector } from './PatientSelector';
-import { Upload, File, X, AlertCircle } from 'lucide-react';
+import { Upload, File as FileIcon, X, AlertCircle } from 'lucide-react';
 import { useToast } from '@/components/ui/toast';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Progress } from '@/components/ui/progress';
@@ -20,10 +20,12 @@ const medicalRecordSchema = z.object({
   patientId: z.string().min(1, 'Patient is required'),
   title: z.string().min(1, 'Title is required').max(200, 'Title must be less than 200 characters'),
   description: z.string().max(1000, 'Description must be less than 1000 characters').optional(),
-  file: z.instanceof(File, { message: 'File is required' }).refine(
-    (file) => file.size <= 10 * 1024 * 1024,
-    'File size must be less than 10MB'
-  ),
+  file: z
+    .custom<File>((val) => val instanceof File, { message: 'File is required' })
+    .refine(
+      (file) => file.size <= 10 * 1024 * 1024,
+      'File size must be less than 10MB'
+    ),
 });
 
 type MedicalRecordFormData = z.infer<typeof medicalRecordSchema>;
@@ -47,14 +49,6 @@ export function MedicalRecordForm({ onSuccess }: MedicalRecordFormProps) {
       description: '',
     },
   });
-
-  const fileWatch = form.watch('file');
-
-  React.useEffect(() => {
-    if (fileWatch) {
-      setSelectedFile(fileWatch as File);
-    }
-  }, [fileWatch]);
 
   const onSubmit = async (data: MedicalRecordFormData) => {
     setError(null);
@@ -85,7 +79,12 @@ export function MedicalRecordForm({ onSuccess }: MedicalRecordFormProps) {
         description: '',
       });
       setSelectedFile(null);
-      form.setValue('file', undefined as any);
+      form.setValue('file', undefined as any, { shouldValidate: false });
+      // Reset the file input element
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+      if (fileInput) {
+        fileInput.value = '';
+      }
       setUploadProgress(0);
 
       // Call success callback
@@ -104,16 +103,14 @@ export function MedicalRecordForm({ onSuccess }: MedicalRecordFormProps) {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      form.setValue('file', file, { shouldValidate: true });
-    }
-  };
-
   const handleRemoveFile = () => {
     setSelectedFile(null);
-    form.setValue('file', undefined as any);
+    form.setValue('file', undefined as any, { shouldValidate: false });
+    // Reset the file input element
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
   };
 
   const formatFileSize = (bytes: number) => {
@@ -200,16 +197,20 @@ export function MedicalRecordForm({ onSuccess }: MedicalRecordFormProps) {
                             type="file"
                             accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
                             onChange={(e) => {
-                              handleFileChange(e);
-                              onChange(e);
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                onChange(file);
+                                setSelectedFile(file);
+                              }
                             }}
                             disabled={isSubmitting}
                             {...field}
+                            value={undefined}
                           />
                         </div>
                       ) : (
                         <div className="flex items-center gap-3 p-3 border rounded-md bg-muted/50">
-                          <File className="h-5 w-5 text-muted-foreground" />
+                          <FileIcon className="h-5 w-5 text-muted-foreground" />
                           <div className="flex-1">
                             <p className="text-sm font-medium">{selectedFile.name}</p>
                             <p className="text-xs text-muted-foreground">

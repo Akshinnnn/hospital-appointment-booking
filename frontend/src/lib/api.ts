@@ -126,13 +126,10 @@ export const uploadMedicalRecord = (
   formData.append('patient_Id', patientId);
   if (title) formData.append('title', title);
   if (description) formData.append('description', description);
-  formData.append('file', file);
+  formData.append('File', file);
   
-  return api.post('/api/record', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
+  // Let axios automatically set Content-Type with boundary for FormData
+  return api.post('/api/record', formData);
 };
 
 export const getMedicalRecordById = (recordId: string) => 
