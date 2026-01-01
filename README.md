@@ -1347,46 +1347,6 @@ All services return standardized error responses:
 }
 ```
 
-Common HTTP status codes:
-- `200 OK` - Success
-- `400 Bad Request` - Validation error or business rule violation
-- `401 Unauthorized` - Missing or invalid token
-- `403 Forbidden` - Insufficient permissions
-- `404 Not Found` - Resource not found
-- `500 Internal Server Error` - Server error
-
-### OpenAPI Documentation
-
-In development mode, OpenAPI documentation is available:
-
-- **ApiGateway:** http://localhost:8080/openapi/v1.json
-- **UserService:** http://localhost:8081/openapi/v1.json
-- **AppointmentService:** http://localhost:8082/openapi/v1.json
-- **MedicalRecordsService:** http://localhost:8083/openapi/v1.json
-
----
-
-## Additional Notes
-
-### Development Best Practices
-
-- **Environment Variables:** Use `.env` files or environment variables for sensitive configuration
-- **Secrets Management:** Never commit GCP credentials or JWT secrets to version control
-- **Database Migrations:** Always test migrations in development before production
-- **Logging:** Use structured logging for better observability
-- **Error Handling:** Implement comprehensive error handling and logging
-
-### Future Enhancements
-
-- **Service-to-Service Authentication:** Implement service tokens for internal communication
-- **Event Sourcing:** Consider event sourcing for audit trails
-- **CQRS:** Implement Command Query Responsibility Segregation for read/write optimization
-- **API Versioning:** Add API versioning for backward compatibility
-- **Rate Limiting:** Implement rate limiting at API Gateway
-- **Monitoring:** Add distributed tracing (OpenTelemetry) and metrics (Prometheus)
-- **Health Checks:** Implement comprehensive health check endpoints
-- **Circuit Breaker:** Add circuit breaker pattern for resilience
-
 ---
 
 
