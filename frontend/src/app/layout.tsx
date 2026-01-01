@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { SessionProviderWrapper } from '@/components/providers/SessionProviderWrapper';
 import { ConditionalNavbar } from "@/components/layout/ConditionalNavbar";
+import { ConditionalFooter } from "@/components/layout/ConditionalFooter";
 import { TokenManager } from "@/components/auth/TokenManager";
 import { ToastProvider } from "@/components/ui/toast";
 
@@ -25,6 +26,7 @@ export default function RootLayout({
             <main className="py-6">
               {children}
             </main>
+            <ConditionalFooter />
           </ToastProvider>
         </SessionProviderWrapper>
       </body>
