@@ -22,6 +22,9 @@ export default async function HomePage() {
           <Button asChild variant="outline">
             <Link href="/appointments">View My Appointments</Link>
           </Button>
+          <Button asChild variant="outline">
+            <Link href="/dashboard">Dashboard</Link>
+          </Button>
         </div>
         </div>
       </section>

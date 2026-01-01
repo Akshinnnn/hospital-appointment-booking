@@ -16,7 +16,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 
 const STORAGE_KEY = 'doctor_schedules';
 
-export default function DoctorDashboardPage() {
+export function DoctorDashboardPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -301,3 +301,4 @@ export default function DoctorDashboardPage() {
     </div>
   );
 }
+

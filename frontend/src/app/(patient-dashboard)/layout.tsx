@@ -26,8 +26,10 @@ export default async function PatientDashboardLayout({
   }
 
   return (
-    <div>
-      {children}
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto p-4 md:p-6 lg:p-8">
+        {children}
+      </div>
     </div>
   );
 }
